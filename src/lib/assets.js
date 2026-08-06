@@ -36,7 +36,12 @@ function pickTier() {
 export const TIER = pickTier()
 export const VIDEO_FPS = 24
 
-const v = (name) => `/assets/videos/${TIER}/${name}.mp4`
+// BASE_URL is '/' in dev and on a custom domain, and '/<repo>/' on GitHub Pages
+// project sites. Everything below is built from it so the same bundle works in
+// both places — hardcoded leading-slash paths silently 404 on Pages.
+const BASE = import.meta.env.BASE_URL
+
+const v = (name) => `${BASE}assets/videos/${TIER}/${name}.mp4`
 
 export const VIDEOS = {
   heroChair: v('hero-chair'),
@@ -48,18 +53,20 @@ export const VIDEOS = {
   villaAssembly: v('villa-assembly'),
 }
 
+const i = (name) => `${BASE}assets/images/${name}.jpg`
+
 export const IMAGES = {
-  loungeChair: '/assets/images/lounge-chair.jpg',
-  coffeeTable: '/assets/images/coffee-table.jpg',
-  kitchenIsland: '/assets/images/kitchen-island.jpg',
-  kingBed: '/assets/images/king-bed.jpg',
-  floorLamp: '/assets/images/floor-lamp.jpg',
-  brassFaucet: '/assets/images/brass-faucet.jpg',
-  sculpture: '/assets/images/sculpture.jpg',
-  oliveTree: '/assets/images/olive-tree.jpg',
-  villaModel: '/assets/images/villa-model.jpg',
-  blueprint: '/assets/images/blueprint.jpg',
-  materialCube: '/assets/images/material-cube.jpg',
+  loungeChair: i('lounge-chair'),
+  coffeeTable: i('coffee-table'),
+  kitchenIsland: i('kitchen-island'),
+  kingBed: i('king-bed'),
+  floorLamp: i('floor-lamp'),
+  brassFaucet: i('brass-faucet'),
+  sculpture: i('sculpture'),
+  oliveTree: i('olive-tree'),
+  villaModel: i('villa-model'),
+  blueprint: i('blueprint'),
+  materialCube: i('material-cube'),
 }
 
 // Playback order — the finale preloads nothing until the blueprint is on screen.

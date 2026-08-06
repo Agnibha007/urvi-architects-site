@@ -9,7 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="preload" as="video" href="/assets/videos/hero-chair.mp4" type="video/mp4" />
+    <!-- The hero clip is not preloaded here: which rendition to fetch (hd vs sd)
+         is decided at runtime from device + network, so a static preload hint
+         would download the wrong file. The Preloader fetches the chosen one. -->
   </head>
   <body>
     <div id="root"></div>
