@@ -59,8 +59,9 @@ export function useScrollVideo({
           io.disconnect()
         }
       },
-      // Start fetching a full viewport early so it is decoded before it is seen.
-      { rootMargin: '120% 0px 120% 0px' }
+      // Start fetching early so video is decoded before it is seen.
+      // Smaller margin on mobile to avoid unnecessary downloads on slow connections.
+      { rootMargin: window.innerWidth < 768 ? '60% 0px 60% 0px' : '120% 0px 120% 0px' }
     )
 
     if (eager) attach()

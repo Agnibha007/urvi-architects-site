@@ -10,15 +10,16 @@ export function useLenis() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
+    const isMobile = window.innerWidth < 768
     const lenis = new Lenis({
-      duration: 1.25,
+      duration: isMobile ? 0.9 : 1.25,
       // Long, decelerating tail — the "heavy object slowing down" feel.
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
+      smoothWheel: !isMobile,
       syncTouch: true,
-      syncTouchLerp: 0.09,
-      touchInertiaMultiplier: 24,
-      wheelMultiplier: 0.9,
+      syncTouchLerp: isMobile ? 0.12 : 0.09,
+      touchInertiaMultiplier: isMobile ? 16 : 24,
+      wheelMultiplier: isMobile ? 1.1 : 0.9,
       lerp: null,
     })
 

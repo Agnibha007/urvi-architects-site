@@ -26,9 +26,20 @@ function bind() {
     pointer.rx = 0
     pointer.ry = 0
   }
+  const onTouchEnd = () => {
+    // Mobile: pointerleave never fires on finger lift. Reset after a short
+    // delay so parallax has time to damp back to center.
+    setTimeout(() => {
+      pointer.active = false
+      pointer.rx = 0
+      pointer.ry = 0
+    }, 180)
+  }
 
   window.addEventListener('pointermove', onMove, { passive: true })
   window.addEventListener('pointerleave', onLeave, { passive: true })
+  window.addEventListener('pointercancel', onLeave, { passive: true })
+  window.addEventListener('touchend', onTouchEnd, { passive: true })
 
   // Critically damped follow — the "expensive" feel comes from the lag.
   gsap.ticker.add(() => {

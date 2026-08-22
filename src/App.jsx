@@ -44,6 +44,15 @@ export default function App() {
   // Lock scroll until the overture ends.
   useEffect(() => {
     document.documentElement.style.overflow = ready ? '' : 'hidden'
+    document.body.style.overflow = ready ? '' : 'hidden'
+    // iOS Safari needs position: fixed to truly lock scroll during preloader
+    if (!ready) {
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    } else {
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
     if (ready) window.__lenis?.start()
     else window.__lenis?.stop()
   }, [ready])

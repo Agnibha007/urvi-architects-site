@@ -107,6 +107,18 @@
     width: 0;
     background: transparent;
   }
+
+  /* Mobile touch: prevent pull-to-refresh and overscroll bounce */
+  html, body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Smooth video playback on mobile — reduce GPU jank */
+  video[aria-hidden='true'] {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @layer components {
