@@ -45,11 +45,6 @@ playwright-report/
 # TypeScript
 *.tsbuildinfo
 
-# Large media — videos are ~160MB and must not be committed to git.
-# To restore them, copy from your backup or re-export from source.
-public/assets/videos/hd/*.mp4
-public/assets/videos/sd/*.mp4
-public/assets/videos/sd/README.md
 
 # Encoder logs
 encode.log
