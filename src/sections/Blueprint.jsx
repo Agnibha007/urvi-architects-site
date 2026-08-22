@@ -127,7 +127,7 @@ export default function Blueprint({ buildRef }) {
               <span className="block h-[7px] w-[7px] -translate-x-1/2 rounded-full border border-[#9FD6E8] bg-[#9FD6E8]/25" />
               <span className="mt-2 block h-[1px] w-14 bg-[#9FD6E8]/45" />
               <p className="eyebrow mt-1.5 text-[#9FD6E8]/90">{l.t}</p>
-              <p className="font-sans text-[10px] font-light tracking-wide text-[#9FD6E8]/45">{l.d}</p>
+              <p className="font-sans text-[10px] font-light tracking-wide text-[#9FD6E8]/60">{l.d}</p>
             </div>
           ))}
         </div>
@@ -135,7 +135,7 @@ export default function Blueprint({ buildRef }) {
         <div className="pointer-events-none relative z-40 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
           <div className="flex items-start justify-between">
             <span className="eyebrow text-[#9FD6E8]/60">05 — Drawing Set</span>
-            <span className="eyebrow hidden sm:inline text-[#9FD6E8]/35">Sheet A—101 / Scale 1:100</span>
+            <span className="eyebrow hidden sm:inline text-[#9FD6E8]/50">Sheet A—101 / Scale 1:100</span>
           </div>
 
           <div ref={title} className="max-w-[44rem] will-move">
@@ -153,7 +153,7 @@ export default function Blueprint({ buildRef }) {
               Every villa exists twice — once as geometry, once as weather. We draw the first so
               carefully that the second can be left alone.
             </p>
-            <span className="eyebrow hidden md:block text-[#9FD6E8]/30">GFA 412 m² / Plot 1,840 m²</span>
+            <span className="eyebrow hidden md:block text-[#9FD6E8]/45">GFA 412 m² / Plot 1,840 m²</span>
           </div>
         </div>
       </Chapter>

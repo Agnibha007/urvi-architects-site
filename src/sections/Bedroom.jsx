@@ -131,7 +131,7 @@ export default function Bedroom() {
               Linen in three weights. A single pendant, lowered until it is almost furniture.
               Everything at the height of a person lying down.
             </p>
-            <span className="eyebrow hidden sm:block text-white/45">2700 K — 12 lux</span>
+            <span className="eyebrow hidden sm:block text-white/60">2700 K — 12 lux</span>
           </div>
         </div>
       </Chapter>

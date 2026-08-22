@@ -124,9 +124,9 @@ export default function Hero() {
                 We do not decorate rooms. We compose the conditions — light, mass, material and
                 silence — under which a life is worth living slowly.
               </p>
-              <div ref={cue} className="eyebrow flex items-center gap-3 text-white/50 will-move">
+              <div ref={cue} className="eyebrow flex items-center gap-3 text-white/65 will-move">
                 <span className="inline">Scroll</span>
-                <span className="block h-[1px] w-10 origin-left bg-white/40 md:w-16" />
+                <span className="block h-[1px] w-10 origin-left bg-white/50 md:w-16" />
               </div>
             </div>
           </div>

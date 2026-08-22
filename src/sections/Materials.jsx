@@ -75,13 +75,13 @@ export default function Materials({ cubeColorRef }) {
         <div className="relative z-30 grid h-full grid-cols-1 gap-6 sm:gap-8 px-5 sm:px-6 py-8 sm:py-10 md:grid-cols-2 md:px-12 md:py-16">
           {/* Left — the specimen sits in the 3D layer behind this column */}
           <div className="flex flex-col justify-between">
-            <span className="eyebrow text-ink/45">04 — Material Library</span>
+            <span className="eyebrow text-ink/55">04 — Material Library</span>
             <h2 ref={headRef} className="display-md max-w-[12ch] text-ink will-move">
               Six ways
               <br />
               <span className="italic text-accent">to hold light.</span>
             </h2>
-            <span className="eyebrow hidden text-ink/30 md:block">Specimen rotating — 360°</span>
+            <span className="eyebrow hidden text-ink/45 md:block">Specimen rotating — 360°</span>
           </div>
 
           {/* Right — the index */}
@@ -100,7 +100,7 @@ export default function Materials({ cubeColorRef }) {
                 >
                   <div className="flex items-baseline justify-between gap-3 sm:gap-6">
                     <div className="flex items-baseline gap-2.5 sm:gap-4 md:gap-6">
-                      <span className="eyebrow w-5 sm:w-6 shrink-0 text-ink/35">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="eyebrow w-5 sm:w-6 shrink-0 text-ink/50">{String(i + 1).padStart(2, '0')}</span>
                       <h3
                         className="!text-[clamp(1.2rem,4.2vw,3.4rem)] font-display leading-none"
                         style={{
@@ -131,7 +131,7 @@ export default function Materials({ cubeColorRef }) {
                   >
                     <div className="min-h-0">
                       <p className="body-sm ml-7 sm:ml-10 pt-1.5 sm:pt-2 text-ink/60 md:ml-[3.1rem]">
-                        {m.note} <span className="text-ink/35">— {m.origin}</span>
+                        {m.note} <span className="text-ink/50">— {m.origin}</span>
                       </p>
                     </div>
                   </div>

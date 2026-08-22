@@ -125,7 +125,7 @@ export default function Kitchen() {
         <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
           <div className="flex items-start justify-between">
             <span className="eyebrow text-white/70">02 — The Kitchen</span>
-            <span className="eyebrow hidden text-white/50 md:block">Object 02 / Marble Island</span>
+            <span className="eyebrow hidden text-white/60 md:block">Object 02 / Marble Island</span>
           </div>
 
           <h2 ref={heading} className="display-lg max-w-[16ch] text-white will-move">
@@ -136,8 +136,8 @@ export default function Kitchen() {
 
           <div ref={specs} className="grid max-w-3xl grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 sm:gap-y-4">
             {SPECS.map(([k, v]) => (
-              <div key={k} className="will-move border-t border-white/20 pt-2 sm:pt-3">
-                <p className="eyebrow mb-1 sm:mb-1.5 text-white/50">{k}</p>
+              <div key={k} className="will-move border-t border-white/30 pt-2 sm:pt-3">
+                <p className="eyebrow mb-1 sm:mb-1.5 text-white/65">{k}</p>
                 <p className="body-sm text-white/80">{v}</p>
               </div>
             ))}

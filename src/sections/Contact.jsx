@@ -67,7 +67,7 @@ export default function Contact() {
       {/* Address block — stacks on mobile, grid on desktop */}
       <div className="pointer-events-none mx-auto grid max-w-[1400px] grid-cols-1 gap-x-10 gap-y-10 sm:gap-y-14 border-t border-ink/12 pt-10 sm:pt-12 md:grid-cols-12 md:pt-16">
         <div className="md:col-span-5">
-          <p className="eyebrow mb-4 sm:mb-6 text-ink/35">Enquiries</p>
+          <p className="eyebrow mb-4 sm:mb-6 text-ink/50">Enquiries</p>
           <a
             href="mailto:studio@urviarchitects.com"
             className="pointer-events-auto group inline-flex items-start gap-2 text-ink break-all sm:break-normal"
@@ -81,7 +81,7 @@ export default function Contact() {
         </div>
 
         <Reveal variant="lines" className="md:col-span-3 md:col-start-7" stagger={0.1}>
-          <p className="eyebrow mb-4 sm:mb-6 text-ink/35">Studio</p>
+          <p className="eyebrow mb-4 sm:mb-6 text-ink/50">Studio</p>
           <p className="body-sm text-ink/70">
             Via dei Coronari 148
             <br />
@@ -97,7 +97,7 @@ export default function Contact() {
         </Reveal>
 
         <Reveal variant="lines" className="md:col-span-2 md:col-start-11" stagger={0.1}>
-          <p className="eyebrow mb-4 sm:mb-6 text-ink/35">Index</p>
+          <p className="eyebrow mb-4 sm:mb-6 text-ink/50">Index</p>
           {NAV.map(([label, href]) => (
             <a
               key={label}
@@ -124,7 +124,7 @@ export default function Contact() {
 
       {/* Base rule */}
       <div className="pointer-events-none mx-auto mt-8 sm:mt-10 flex max-w-[1400px] flex-col gap-4 sm:gap-5 border-t border-ink/12 pt-5 sm:pt-6 md:flex-row md:items-center md:justify-between">
-        <p className="eyebrow text-ink/35">© {new Date().getFullYear()} Urvi Architects — All rights reserved</p>
+        <p className="eyebrow text-ink/50">© {new Date().getFullYear()} Urvi Architects — All rights reserved</p>
 
         <div className="flex items-center gap-6 sm:gap-7">
           {SOCIAL.map(({ label, href, Icon }) => (
@@ -133,7 +133,7 @@ export default function Contact() {
               href={href}
               target="_blank"
               rel="noreferrer noopener"
-              className="pointer-events-auto eyebrow group inline-flex items-center gap-2 text-ink/45 transition-colors duration-500 hover:text-accent"
+              className="pointer-events-auto eyebrow group inline-flex items-center gap-2 text-ink/55 transition-colors duration-500 hover:text-accent"
             >
               <Icon className="text-[13px]" />
               {label}
@@ -143,7 +143,7 @@ export default function Contact() {
 
         <button
           onClick={(e) => go(e, '#hero')}
-          className="pointer-events-auto eyebrow text-left text-ink/35 transition-colors duration-500 hover:text-accent md:text-right"
+          className="pointer-events-auto eyebrow text-left text-ink/50 transition-colors duration-500 hover:text-accent md:text-right"
         >
           Return to the beginning ↑
         </button>
