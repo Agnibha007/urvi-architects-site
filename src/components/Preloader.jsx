@@ -16,6 +16,8 @@ export default function Preloader({ onDone }) {
   const bar = useRef(null)
   const word = useRef(null)
   const [n, setN] = useState(0)
+  const exitedRef = useRef(false)
+  const tlRef = useRef(null)
 
   // Real readiness: the hero clip must be buffered enough to seek.
   useEffect(() => {
@@ -57,12 +59,22 @@ export default function Preloader({ onDone }) {
     raf = requestAnimationFrame(progress)
 
     const exit = () => {
+      // Guard: StrictMode double-mounts; only the first exit wins.
+      if (exitedRef.current) return
+      exitedRef.current = true
+
       const tl = gsap.timeline({
         onComplete: () => {
+          // Do NOT call root.current?.remove() — React owns the DOM.
+          // When onDone() sets ready=true in App, React unmounts this
+          // component and removes the node cleanly. Calling remove()
+          // here detaches the fiber target before React's commit phase,
+          // causing the "node is not a child" NotFoundError.
           onDone?.()
-          root.current?.remove()
         },
       })
+
+      tlRef.current = tl
 
       tl.to([counter.current, word.current, bar.current], {
         yPercent: -120,
@@ -81,6 +93,9 @@ export default function Preloader({ onDone }) {
 
     return () => {
       cancelAnimationFrame(raf)
+      // Kill the GSAP timeline if still running — prevents the onComplete
+      // from firing after React has already begun unmounting.
+      tlRef.current?.kill()
       v.removeAttribute('src')
       v.load()
     }

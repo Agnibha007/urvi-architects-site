@@ -11,8 +11,8 @@ export default {
         dark: '#101010',
       },
       fontFamily: {
-        display: ['Canela', 'PP Editorial New', 'Editorial New', 'Times New Roman', 'serif'],
-        sans: ['Neue Montreal', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Canela', 'Cormorant Garamond', 'Instrument Serif', 'Times New Roman', 'serif'],
+        sans: ['Neue Montreal', 'DM Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.055em',

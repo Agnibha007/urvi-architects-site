@@ -39,18 +39,19 @@ export default function Hero() {
         .to(sub.current, { yPercent: -60, opacity: 0, ease: 'none' }, 0)
         .to(cue.current, { opacity: 0, y: 20, duration: 0.15 }, 0)
 
-      // Slow push-in, then the lift-off.
+      // Slow push-in — restrained to keep 1080p sharp on high-DPI.
       tl.fromTo(
         videoWrap.current,
-        { scale: 1.08, yPercent: 0 },
-        { scale: 1.24, yPercent: -6, ease: 'none' },
+        { scale: 1.02, yPercent: 0 },
+        { scale: 1.18, yPercent: -4, ease: 'none' },
         0
       )
-        .to(videoWrap.current, { yPercent: -46, scale: 1.34, ease: 'apple' }, 0.72)
-        .to(title.current, { yPercent: -140, opacity: 0, filter: 'blur(14px)', ease: 'apple' }, 0.74)
+        // Lift-off: chair exits upward, text dissolves.
+        .to(videoWrap.current, { yPercent: -40, scale: 1.26, ease: 'apple' }, 0.7)
+        .to(title.current, { yPercent: -140, opacity: 0, filter: 'blur(14px)', ease: 'apple' }, 0.72)
 
-      // Warm scrim closes over the frame — the "camera moving into the next room".
-      tl.fromTo(scrim.current, { opacity: 0 }, { opacity: 1, ease: 'none' }, 0.78)
+      // Transition scrim — starts earlier, longer duration for a smoother crossfade.
+      tl.fromTo(scrim.current, { opacity: 0 }, { opacity: 1, ease: 'power1.inOut' }, 0.72)
     }, root)
 
     return () => ctx.revert()
@@ -68,15 +69,25 @@ export default function Hero() {
             eager
             start="top top"
             end={() => `+=${window.innerHeight * 3}`}
-            range={[0, 0.78]}
+            range={[0, 0.88]}
             className="h-full w-full"
+            style={{ objectPosition: '50% 50%' }}
           />
-          {/* Editorial vignette — never a gradient overlay for style, only for legibility. */}
+          {/* Two-layer vignette:
+              1. Edge darkening — radial, pushes the eye inward.
+              2. Lower scrim — linear, creates a readable zone for the bottom text. */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'radial-gradient(120% 90% at 50% 45%, rgba(247,245,242,0) 40%, rgba(247,245,242,0.55) 100%)',
+                'radial-gradient(130% 100% at 50% 40%, rgba(21,21,21,0) 30%, rgba(21,21,21,0.25) 100%)',
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(21,21,21,0.45) 0%, rgba(21,21,21,0.15) 35%, rgba(21,21,21,0) 60%)',
             }}
           />
         </div>
@@ -84,19 +95,19 @@ export default function Hero() {
         <div ref={scrim} className="pointer-events-none absolute inset-0 bg-bone opacity-0" />
 
         {/* Type plate */}
-        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-6 py-8 md:px-12 md:py-12">
+        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-6 sm:py-8 md:px-12 md:py-12">
           <div className="flex items-start justify-between">
-            <span className="eyebrow text-ink/50">Est. 2009 — Practice No. 4</span>
-            <span className="eyebrow hidden text-ink/50 md:block">41.9028° N&nbsp;&nbsp;12.4964° E</span>
+            <span className="eyebrow text-white/80">Est. 2009 — Practice No. 4</span>
+            <span className="eyebrow hidden text-white/80 md:block">41.9028° N&nbsp;&nbsp;12.4964° E</span>
           </div>
 
           <div ref={title} className="will-move">
-            <h1 className="display-xl text-ink">
+            <h1 className="display-xl text-white">
               <SplitText by="char" stagger={0.032} duration={1.5} delay={0.35}>
                 We Design
               </SplitText>
-              <br />
-              <span className="italic text-accent">
+              <br className="hidden sm:block" />
+              <span className="block sm:inline italic text-accent">
                 <SplitText by="char" stagger={0.032} duration={1.5} delay={0.62}>
                   Experiences.
                 </SplitText>
@@ -104,17 +115,19 @@ export default function Hero() {
             </h1>
           </div>
 
-          <div ref={sub} className="flex items-end justify-between gap-8 will-move">
-            <p className="eyebrow max-w-[16ch] text-ink/60 md:max-w-none">
-              Urvi Architects — Luxury Interior Studio
-            </p>
-            <p className="body-sm hidden max-w-[34ch] text-ink/70 md:block">
-              We do not decorate rooms. We compose the conditions — light, mass, material and
-              silence — under which a life is worth living slowly.
-            </p>
-            <div ref={cue} className="eyebrow flex items-center gap-3 text-ink/40 will-move">
-              <span className="hidden md:inline">Scroll</span>
-              <span className="block h-[1px] w-10 origin-left bg-ink/30 md:w-16" />
+          <div ref={sub} className="will-move">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+              <p className="eyebrow max-w-[20ch] text-white/70">
+                Urvi Architects — Luxury Interior Studio
+              </p>
+              <p className="body-sm hidden max-w-[34ch] text-white/60 md:block">
+                We do not decorate rooms. We compose the conditions — light, mass, material and
+                silence — under which a life is worth living slowly.
+              </p>
+              <div ref={cue} className="eyebrow flex items-center gap-3 text-white/50 will-move">
+                <span className="inline">Scroll</span>
+                <span className="block h-[1px] w-10 origin-left bg-white/40 md:w-16" />
+              </div>
             </div>
           </div>
         </div>

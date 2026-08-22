@@ -72,7 +72,7 @@ export default function Materials({ cubeColorRef }) {
       <Chapter id="materials" length={3.4} darkness={0} background="#F7F5F2" onProgress={onProgress}>
         <div ref={wash} className="pointer-events-none absolute inset-0 bg-white opacity-0 will-move" />
 
-        <div className="relative z-30 grid h-full grid-cols-1 gap-8 px-6 py-10 md:grid-cols-2 md:px-12 md:py-16">
+        <div className="relative z-30 grid h-full grid-cols-1 gap-6 sm:gap-8 px-5 sm:px-6 py-8 sm:py-10 md:grid-cols-2 md:px-12 md:py-16">
           {/* Left — the specimen sits in the 3D layer behind this column */}
           <div className="flex flex-col justify-between">
             <span className="eyebrow text-ink/45">04 — Material Library</span>
@@ -91,18 +91,18 @@ export default function Materials({ cubeColorRef }) {
               return (
                 <div
                   key={m.name}
-                  className="will-move border-t border-ink/12 py-3.5 md:py-5"
+                  className="will-move border-t border-ink/12 py-2.5 sm:py-3.5 md:py-5"
                   style={{
                     transition: 'opacity 900ms var(--ease-apple), transform 900ms var(--ease-apple)',
                     opacity: on ? 1 : 0.26,
                     transform: on ? 'translate3d(0,0,0)' : 'translate3d(-8px,0,0)',
                   }}
                 >
-                  <div className="flex items-baseline justify-between gap-6">
-                    <div className="flex items-baseline gap-4 md:gap-6">
-                      <span className="eyebrow w-6 shrink-0 text-ink/35">{String(i + 1).padStart(2, '0')}</span>
+                  <div className="flex items-baseline justify-between gap-3 sm:gap-6">
+                    <div className="flex items-baseline gap-2.5 sm:gap-4 md:gap-6">
+                      <span className="eyebrow w-5 sm:w-6 shrink-0 text-ink/35">{String(i + 1).padStart(2, '0')}</span>
                       <h3
-                        className="display-md !text-[clamp(1.6rem,4.2vw,3.4rem)] leading-none"
+                        className="!text-[clamp(1.2rem,4.2vw,3.4rem)] font-display leading-none"
                         style={{
                           color: on ? '#151515' : '#151515',
                           transition: 'letter-spacing 900ms var(--ease-apple)',
@@ -113,7 +113,7 @@ export default function Materials({ cubeColorRef }) {
                       </h3>
                     </div>
                     <span
-                      className="h-3.5 w-3.5 shrink-0 rounded-full ring-1 ring-ink/10"
+                      className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 rounded-full ring-1 ring-ink/10"
                       style={{
                         background: m.hex,
                         transform: on ? 'scale(1)' : 'scale(0.5)',
@@ -122,14 +122,15 @@ export default function Materials({ cubeColorRef }) {
                     />
                   </div>
                   <div
-                    className="grid overflow-hidden"
+                    className="grid overflow-hidden will-move"
                     style={{
                       gridTemplateRows: on ? '1fr' : '0fr',
                       transition: 'grid-template-rows 900ms var(--ease-apple)',
+                      willChange: 'grid-template-rows',
                     }}
                   >
                     <div className="min-h-0">
-                      <p className="body-sm ml-10 pt-2 text-ink/60 md:ml-[3.1rem]">
+                      <p className="body-sm ml-7 sm:ml-10 pt-1.5 sm:pt-2 text-ink/60 md:ml-[3.1rem]">
                         {m.note} <span className="text-ink/35">— {m.origin}</span>
                       </p>
                     </div>

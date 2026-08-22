@@ -9,9 +9,7 @@ import { VIDEOS, IMAGES } from '@/lib/assets'
  * BEDROOM — the bed assembles, then the curtains open, then the light descends.
  *
  * Two clips share one pin. The bed assembly runs 0 → 0.55; the pendant light
- * clip runs 0.55 → 1 and cross-fades in underneath. Because both are already
- * decoded and both are scrubbed by the same trigger, the handover happens
- * mid-motion and reads as one continuous shot.
+ * clip runs 0.55 → 1 and cross-fades in underneath.
  *
  * Typography is deliberately withheld until the bed is finished — the room is
  * allowed to be quiet first.
@@ -38,7 +36,7 @@ export default function Bedroom() {
         },
       })
 
-      // --- Curtains. A clip-path reveal, not two moving divs, so it costs nothing.
+      // --- Curtains. A clip-path reveal.
       tl.fromTo(curtainL.current, { xPercent: 0 }, { xPercent: -102, ease: 'apple', duration: 0.34 }, 0.02)
       tl.fromTo(curtainR.current, { xPercent: 0 }, { xPercent: 102, ease: 'apple', duration: 0.34 }, 0.02)
 
@@ -98,20 +96,29 @@ export default function Bedroom() {
           style={{ background: 'radial-gradient(80% 65% at 50% 30%, #F4D9AE 0%, rgba(244,217,174,0) 72%)' }}
         />
 
+        {/* Dark scrim for text legibility */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to top, rgba(21,21,21,0.5) 0%, rgba(21,21,21,0.15) 40%, rgba(21,21,21,0) 65%)',
+          }}
+        />
+
         {/* Curtains */}
         <div ref={curtainL} className="pointer-events-none absolute inset-y-0 left-0 z-20 w-1/2 bg-[#E4DED5] will-move" />
         <div ref={curtainR} className="pointer-events-none absolute inset-y-0 right-0 z-20 w-1/2 bg-[#E4DED5] will-move" />
 
-        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-6 py-10 md:px-12 md:py-16">
-          <span className="eyebrow text-ink/40">03 — The Bedroom</span>
+        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
+          <span className="eyebrow text-white/60">03 — The Bedroom</span>
 
           <div ref={type} className="max-w-[46rem] will-move">
-            <h2 className="display-lg text-ink">
+            <h2 className="display-lg text-white">
               <SplitText by="word" stagger={0.07} duration={1.4} start="top 90%">
                 Built for the
               </SplitText>
-              <br />
-              <span className="italic text-accent">
+              <br className="hidden sm:block" />
+              <span className="block sm:inline italic text-accent">
                 <SplitText by="word" stagger={0.07} duration={1.4} start="top 90%">
                   end of the day.
                 </SplitText>
@@ -119,12 +126,12 @@ export default function Bedroom() {
             </h2>
           </div>
 
-          <div ref={quote} className="flex max-w-6xl items-end justify-between gap-10 will-move">
-            <p className="body-sm max-w-[38ch] text-ink/65">
+          <div ref={quote} className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-10 will-move">
+            <p className="body-sm max-w-[38ch] text-white/65">
               Linen in three weights. A single pendant, lowered until it is almost furniture.
               Everything at the height of a person lying down.
             </p>
-            <span className="eyebrow hidden text-ink/35 md:block">2700 K — 12 lux</span>
+            <span className="eyebrow hidden sm:block text-white/45">2700 K — 12 lux</span>
           </div>
         </div>
       </Chapter>

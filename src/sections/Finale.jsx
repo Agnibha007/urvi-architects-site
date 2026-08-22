@@ -9,8 +9,7 @@ import { VIDEOS, IMAGES } from '@/lib/assets'
  *
  * Three statements occupy the same optical centre in sequence. They are never
  * on screen together and never move sideways: each rises, holds, and is lifted
- * away by the next. That vertical stack is what makes the ending feel like a
- * title sequence rather than a list of headlines.
+ * away by the next.
  *
  * Dawn returns underneath — the dark blueprint world resolves back to bone.
  */
@@ -70,30 +69,34 @@ export default function Finale() {
             range={[0.02, 0.94]}
             className="h-full w-full"
           />
+          {/* Dark scrim for text legibility over bright video */}
           <div
             className="pointer-events-none absolute inset-0"
-            style={{ background: 'radial-gradient(120% 95% at 50% 50%, rgba(247,245,242,0) 42%, rgba(247,245,242,0.6) 100%)' }}
+            style={{
+              background:
+                'linear-gradient(to top, rgba(21,21,21,0.45) 0%, rgba(21,21,21,0.15) 35%, rgba(21,21,21,0) 60%), radial-gradient(130% 100% at 50% 50%, rgba(21,21,21,0) 20%, rgba(21,21,21,0.2) 100%)',
+            }}
           />
         </div>
 
         <div ref={dawn} className="pointer-events-none absolute inset-0 bg-dark will-move" />
 
-        <div className="pointer-events-none relative z-30 flex h-full flex-col items-center justify-center px-6 text-center">
-          <div className="relative flex h-[46vh] w-full max-w-6xl items-center justify-center">
-            <h2 ref={l1} className="display-lg absolute text-ink will-move">
+        <div className="pointer-events-none relative z-30 flex h-full flex-col items-center justify-center px-5 sm:px-6 text-center">
+          <div className="relative flex h-[50vh] sm:h-[46vh] w-full max-w-6xl items-center justify-center">
+            <h2 ref={l1} className="display-lg absolute text-white will-move">
               Designed
-              <br />
-              <span className="italic text-accent">For Living.</span>
+              <br className="hidden sm:block" />
+              <span className="block sm:inline italic text-accent">For Living.</span>
             </h2>
 
-            <h2 ref={l2} className="display-lg absolute text-ink will-move">
+            <h2 ref={l2} className="display-lg absolute text-white will-move">
               Our Spaces
-              <br />
-              <span className="italic text-accent">Tell Stories.</span>
+              <br className="hidden sm:block" />
+              <span className="block sm:inline italic text-accent">Tell Stories.</span>
             </h2>
 
             <div ref={cta} className="absolute flex flex-col items-center will-move">
-              <p className="eyebrow mb-8 text-ink/45">Commissions open — 2027</p>
+              <p className="eyebrow mb-6 sm:mb-8 text-white/60">Commissions open — 2027</p>
               <a
                 href="#contact"
                 className="pointer-events-auto group inline-flex flex-col items-center"
@@ -104,12 +107,12 @@ export default function Finale() {
                     : document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })
                 }}
               >
-                <span className="display-md text-ink transition-[letter-spacing] duration-700 ease-apple group-hover:tracking-[-0.02em]">
+                <span className="display-md text-white transition-[letter-spacing] duration-700 ease-apple group-hover:tracking-[-0.02em]">
                   Start Your Project
                 </span>
                 <span
                   ref={ctaLine}
-                  className="mt-3 block h-[1.5px] w-full origin-left bg-accent will-move"
+                  className="mt-2 sm:mt-3 block h-[1.5px] w-full origin-left bg-accent will-move"
                 />
               </a>
             </div>

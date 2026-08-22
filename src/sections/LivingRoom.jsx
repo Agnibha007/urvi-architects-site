@@ -86,6 +86,15 @@ export default function LivingRoom() {
         {/* Light layer */}
         <div ref={light} className="pointer-events-none absolute inset-0 mix-blend-multiply will-move" />
 
+        {/* Dark scrim for text legibility over bright video */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to top, rgba(21,21,21,0.5) 0%, rgba(21,21,21,0.2) 40%, rgba(21,21,21,0) 65%), radial-gradient(130% 100% at 50% 50%, rgba(21,21,21,0) 20%, rgba(21,21,21,0.2) 100%)',
+          }}
+        />
+
         {/* Discrete objects — each stands alone, never composited together. */}
         <img
           ref={lamp}
@@ -104,11 +113,11 @@ export default function LivingRoom() {
           className="pointer-events-none absolute bottom-[8%] right-[4%] hidden w-[11vw] max-w-[160px] object-contain mix-blend-multiply will-move lg:block"
         />
 
-        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-6 py-10 md:px-12 md:py-16">
-          <span className="eyebrow text-ink/45">01 — The Living Room</span>
+        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
+          <span className="eyebrow text-white/70">01 — The Living Room</span>
 
           <div className="max-w-[52rem]">
-            <h2 ref={heading} className="display-lg text-ink will-move">
+            <h2 ref={heading} className="display-lg text-white will-move">
               A room that
               <br />
               <span className="italic text-accent">holds the hour.</span>
@@ -118,7 +127,7 @@ export default function LivingRoom() {
           <div ref={lines} className="max-w-[36rem]">
             {COPY.map((line) => (
               <span key={line} className="line-mask">
-                <span className="body-sm block text-ink/70 will-move">{line}</span>
+                <span className="body-sm block text-white/70 will-move">{line}</span>
               </span>
             ))}
           </div>

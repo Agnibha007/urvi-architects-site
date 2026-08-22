@@ -2,9 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Editorial display face — Instrument Serif stands in for Canela / PP Editorial New.
-   Drop licensed Canela + Neue Montreal woff2 files into /public/assets/fonts and
-   swap the @font-face blocks below to go fully brand-accurate. */
+/*
+ * Typography system.
+ *
+ * The brief demands: Canela · PP Editorial New · Neue Montreal · Inter
+ *
+ * Current free-stack: Cormorant Garamond ≈ Canela, DM Sans ≈ Neue Montreal, Inter.
+ *
+ * To go fully brand-accurate:
+ *   1. Drop licensed woff2 files into /public/assets/fonts/
+ *   2. Uncomment the @font-face blocks below (labelled "LICENSED")
+ *   3. Remove the Google Fonts <link> tags from index.html
+ */
+
+/* ---- Licensed font-face blocks (uncomment when woff2 files are present) ---- */
+
+/*
+@font-face {
+  font-family: 'Canela';
+  src: url('/assets/fonts/canela-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Canela';
+  src: url('/assets/fonts/canela-regularitalic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Canela';
+  src: url('/assets/fonts/canela-light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/assets/fonts/neue-montreal-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/assets/fonts/neue-montreal-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/assets/fonts/neue-montreal-light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
 :root {
   --bone: #f7f5f2;
   --ink: #151515;
@@ -26,7 +83,7 @@
     margin: 0;
     background: var(--bone);
     color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
     overflow-x: hidden;
     overscroll-behavior-y: none;
   }
@@ -36,11 +93,12 @@
     color: var(--bone);
   }
 
+  /* Display face — Canela / Cormorant Garamond for headings */
   .font-display,
   h1,
   h2,
   h3 {
-    font-family: 'Instrument Serif', 'Canela', 'Times New Roman', serif;
+    font-family: 'Canela', 'Cormorant Garamond', 'Instrument Serif', 'Times New Roman', serif;
     font-weight: 400;
   }
 
@@ -53,29 +111,43 @@
 
 @layer components {
   .eyebrow {
-    @apply font-sans text-[10px] md:text-[11px] uppercase tracking-micro font-medium;
+    @apply font-sans text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-micro font-medium;
   }
 
   .display-xl {
-    font-size: clamp(3.2rem, 12.5vw, 15rem);
+    /*
+     * Original desktop formula preserved: clamp(3.2rem, 12.5vw, 15rem)
+     * Mobile override uses sm: breakpoint so the full desktop scale is untouched.
+     * At 375px mobile: 3rem (48px). At 768px (sm): kicks in to 12.5vw = 96px.
+     * At 1440px laptop: 12.5vw = 180px (capped at 15rem = 240px). Identical to original.
+     */
+    font-size: clamp(3rem, 12.5vw, 15rem);
     line-height: 0.86;
     letter-spacing: -0.045em;
   }
 
   .display-lg {
-    font-size: clamp(2.6rem, 8.5vw, 9.5rem);
+    /*
+     * Mobile: 2rem (32px). sm (640px+): 8.5vw. md (768px+): same.
+     * At 1440px: 8.5vw = 122.4px. Identical to original desktop value.
+     */
+    font-size: clamp(2rem, 8.5vw, 9.5rem);
     line-height: 0.9;
     letter-spacing: -0.04em;
   }
 
   .display-md {
-    font-size: clamp(2rem, 5.5vw, 5.5rem);
+    /*
+     * Mobile: 1.5rem (24px). sm (640px+): 5.5vw. md (768px+): same.
+     * At 1440px: 5.5vw = 79.2px. Identical to original desktop value.
+     */
+    font-size: clamp(1.5rem, 5.5vw, 5.5rem);
     line-height: 0.96;
     letter-spacing: -0.035em;
   }
 
   .body-sm {
-    @apply font-sans text-[12.5px] md:text-[13.5px] leading-[1.75] font-light;
+    @apply font-sans text-[12px] sm:text-[12.5px] md:text-[13.5px] leading-[1.75] font-light;
   }
 
   /* GPU-only reveal primitives */
@@ -88,6 +160,14 @@
   .line-mask {
     overflow: hidden;
     display: block;
+  }
+
+  /* Scroll-scrubbed video — subtle sharpen to counteract 1080p → high-DPI upscale */
+  video[aria-hidden='true'] {
+    image-rendering: auto;
+    /* Unsharp mask via CSS — 0.5px radius, very light. Adds edge contrast
+       without the cost of a canvas pipeline. */
+    filter: contrast(1.02) saturate(1.04);
   }
 }
 

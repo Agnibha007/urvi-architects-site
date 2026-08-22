@@ -58,13 +58,13 @@ export default function Nav() {
       {/* Wordmark */}
       <button
         onClick={() => go('hero')}
-        className="pointer-events-auto absolute left-6 top-6 md:left-12 md:top-8"
+        className="pointer-events-auto absolute left-4 top-4 sm:left-6 sm:top-6 md:left-12 md:top-8"
         style={{ color: 'var(--chrome)', transition: 'color 900ms var(--ease-apple)' }}
       >
-        <span className="font-display text-[15px] leading-none tracking-[0.14em] md:text-[17px]">
+        <span className="font-display text-[13px] sm:text-[15px] md:text-[17px] leading-none tracking-[0.14em]">
           URVI
         </span>
-        <span className="ml-2 font-sans text-[9px] uppercase tracking-micro opacity-50 md:text-[10px]">
+        <span className="ml-1.5 sm:ml-2 font-sans text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-micro opacity-50">
           Architects
         </span>
       </button>
@@ -103,14 +103,14 @@ export default function Nav() {
         })}
       </nav>
 
-      {/* Enquiry */}
+      {/* Enquiry — safe area padding on mobile */}
       <a
         href="#contact"
         onClick={(e) => {
           e.preventDefault()
           go('contact')
         }}
-        className="pointer-events-auto absolute right-6 top-6 font-sans text-[10px] uppercase tracking-micro md:right-12 md:top-8 md:text-[11px]"
+        className="pointer-events-auto absolute right-4 top-4 sm:right-6 sm:top-6 md:right-12 md:top-8 font-sans text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-micro"
         style={{ color: 'var(--chrome)', transition: 'color 900ms var(--ease-apple)' }}
       >
         Enquire

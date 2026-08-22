@@ -63,15 +63,23 @@ export default function Blueprint({ buildRef }) {
       // Measurement rule extends.
       tl.fromTo(rule.current, { scaleX: 0 }, { scaleX: 1, ease: 'apple', duration: 0.3 }, 0.14)
 
-      tl.fromTo(title.current, { yPercent: 34, opacity: 0, filter: 'blur(14px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.24 }, 0.1)
-
-      // Labels tick on one by one as their part of the building appears.
+      // Title wipes in from below — clip-mask, not a fade.
       tl.fromTo(
-        labels.current.children,
-        { opacity: 0, scale: 0.9 },
-        { opacity: 1, scale: 1, ease: 'apple', duration: 0.14, stagger: 0.09 },
-        0.24
+        title.current,
+        { clipPath: 'inset(100% 0% 0% 0%)', yPercent: 8 },
+        { clipPath: 'inset(0% 0% 0% 0%)', yPercent: 0, ease: 'apple', duration: 0.34 },
+        0.1
       )
+
+      // Labels clip in from the left — drafting-table tick marks.
+      Array.from(labels.current.children).forEach((child, i) => {
+        tl.fromTo(
+          child,
+          { clipPath: 'inset(0% 100% 0% 0%)', opacity: 0 },
+          { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, ease: 'apple', duration: 0.18, delay: i * 0.07 },
+          0.24
+        )
+      })
 
       tl.to([labels.current, grid.current, rule.current], { opacity: 0, ease: 'none', duration: 0.12 }, 0.84)
     }, root)
@@ -112,8 +120,8 @@ export default function Blueprint({ buildRef }) {
           }}
         />
 
-        {/* Technical labels */}
-        <div ref={labels} className="pointer-events-none absolute inset-0 z-30">
+        {/* Technical labels — hidden on mobile, visible on md+ */}
+        <div ref={labels} className="pointer-events-none absolute inset-0 z-30 hidden md:block">
           {LABELS.map((l) => (
             <div key={l.t} className="absolute will-move" style={{ left: l.x, top: l.y }}>
               <span className="block h-[7px] w-[7px] -translate-x-1/2 rounded-full border border-[#9FD6E8] bg-[#9FD6E8]/25" />
@@ -124,10 +132,10 @@ export default function Blueprint({ buildRef }) {
           ))}
         </div>
 
-        <div className="pointer-events-none relative z-40 flex h-full flex-col justify-between px-6 py-10 md:px-12 md:py-16">
+        <div className="pointer-events-none relative z-40 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
           <div className="flex items-start justify-between">
             <span className="eyebrow text-[#9FD6E8]/60">05 — Drawing Set</span>
-            <span className="eyebrow text-[#9FD6E8]/35">Sheet A—101 / Scale 1:100</span>
+            <span className="eyebrow hidden sm:inline text-[#9FD6E8]/35">Sheet A—101 / Scale 1:100</span>
           </div>
 
           <div ref={title} className="max-w-[44rem] will-move">
@@ -136,15 +144,16 @@ export default function Blueprint({ buildRef }) {
               <br />
               <span className="italic text-[#9FD6E8]">a line.</span>
             </h2>
-            <div ref={rule} className="mt-8 h-[1px] w-full max-w-md origin-left bg-[#9FD6E8]/40 will-move" />
+            <div ref={rule} className="mt-6 sm:mt-8 h-[1px] w-full max-w-md origin-left bg-[#9FD6E8]/40 will-move" />
           </div>
 
-          <div className="flex items-end justify-between gap-8">
+          {/* Mobile: stack. Desktop: row. */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
             <p className="body-sm max-w-[34ch] text-[#9FD6E8]/50">
               Every villa exists twice — once as geometry, once as weather. We draw the first so
               carefully that the second can be left alone.
             </p>
-            <span className="eyebrow hidden text-[#9FD6E8]/30 md:block">GFA 412 m² / Plot 1,840 m²</span>
+            <span className="eyebrow hidden md:block text-[#9FD6E8]/30">GFA 412 m² / Plot 1,840 m²</span>
           </div>
         </div>
       </Chapter>

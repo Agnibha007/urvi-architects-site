@@ -39,7 +39,7 @@ export default function Kitchen() {
         },
       })
 
-      // Camera zoom + the tilt settling. rotateX easing to 0 is the "landing".
+      // Camera zoom + the tilt settling.
       tl.fromTo(
         plate.current,
         { scale: 1.02, rotateX: 9, rotateY: -7, yPercent: 5 },
@@ -47,7 +47,7 @@ export default function Kitchen() {
         0
       )
 
-      // Contact shadow tightens as the object "settles" — sells the float.
+      // Contact shadow tightens as the object "settles".
       tl.fromTo(
         shadow.current,
         { opacity: 0.1, scaleX: 1.25, filter: 'blur(60px)' },
@@ -55,16 +55,24 @@ export default function Kitchen() {
         0
       )
 
-      // Heading slides in from the left, then continues past — one continuous move.
-      tl.fromTo(heading.current, { xPercent: -34, opacity: 0, filter: 'blur(16px)' }, { xPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.42 }, 0.04)
-      tl.to(heading.current, { xPercent: 14, opacity: 0.12, ease: 'none' }, 0.62)
-
+      // Heading clips in from the left.
       tl.fromTo(
-        specs.current.children,
-        { xPercent: 18, opacity: 0 },
-        { xPercent: 0, opacity: 1, ease: 'apple', duration: 0.26, stagger: 0.1 },
-        0.3
+        heading.current,
+        { clipPath: 'inset(0% 100% 0% 0%)', xPercent: -8 },
+        { clipPath: 'inset(0% 0% 0% 0%)', xPercent: 0, ease: 'apple', duration: 0.52 },
+        0.04
       )
+      tl.to(heading.current, { xPercent: 10, opacity: 0.12, ease: 'none' }, 0.66)
+
+      // Specs clip in individually.
+      Array.from(specs.current.children).forEach((child, i) => {
+        tl.fromTo(
+          child,
+          { clipPath: 'inset(0% 100% 0% 0%)', xPercent: 6 },
+          { clipPath: 'inset(0% 0% 0% 0%)', xPercent: 0, ease: 'apple', duration: 0.3, delay: i * 0.06 },
+          0.3
+        )
+      })
 
       tl.fromTo(faucet.current, { yPercent: 24, opacity: 0 }, { yPercent: -18, opacity: 1, ease: 'none' }, 0.16)
     }, root)
@@ -76,7 +84,7 @@ export default function Kitchen() {
     <div ref={root}>
       <Chapter id="kitchen" length={2.8} darkness={0.08} background="#F2EFEA">
         {/* Floating plate — perspective lives on the parent so the child stays flat-composited */}
-        <div className="absolute inset-0" style={{ perspective: '1600px' }}>
+        <div className="absolute inset-0" style={{ perspective: '1200px' }}>
           <div ref={plate} className="absolute inset-0 will-move" style={{ transformStyle: 'preserve-3d' }}>
             <ScrollVideo
               src={VIDEOS.kitchenIsland}
@@ -96,6 +104,15 @@ export default function Kitchen() {
           className="pointer-events-none absolute bottom-[9%] left-1/2 h-[7vh] w-[58vw] -translate-x-1/2 rounded-[50%] bg-ink/40 will-move"
         />
 
+        {/* Dark scrim for text legibility */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to top, rgba(21,21,21,0.55) 0%, rgba(21,21,21,0.2) 35%, rgba(21,21,21,0) 60%)',
+          }}
+        />
+
         <img
           ref={faucet}
           src={IMAGES.brassFaucet}
@@ -105,23 +122,23 @@ export default function Kitchen() {
           className="pointer-events-none absolute right-[5%] top-[16%] hidden w-[10vw] max-w-[150px] object-contain mix-blend-multiply will-move lg:block"
         />
 
-        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-6 py-10 md:px-12 md:py-16">
+        <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
           <div className="flex items-start justify-between">
-            <span className="eyebrow text-ink/45">02 — The Kitchen</span>
-            <span className="eyebrow hidden text-ink/35 md:block">Object 02 / Marble Island</span>
+            <span className="eyebrow text-white/70">02 — The Kitchen</span>
+            <span className="eyebrow hidden text-white/50 md:block">Object 02 / Marble Island</span>
           </div>
 
-          <h2 ref={heading} className="display-lg max-w-[16ch] text-ink will-move">
+          <h2 ref={heading} className="display-lg max-w-[16ch] text-white will-move">
             Stone,
             <br />
             <span className="italic text-accent">weightless.</span>
           </h2>
 
-          <div ref={specs} className="grid max-w-3xl grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
+          <div ref={specs} className="grid max-w-3xl grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 sm:gap-y-4">
             {SPECS.map(([k, v]) => (
-              <div key={k} className="will-move border-t border-ink/15 pt-3">
-                <p className="eyebrow mb-1.5 text-ink/40">{k}</p>
-                <p className="body-sm text-ink/75">{v}</p>
+              <div key={k} className="will-move border-t border-white/20 pt-2 sm:pt-3">
+                <p className="eyebrow mb-1 sm:mb-1.5 text-white/50">{k}</p>
+                <p className="body-sm text-white/80">{v}</p>
               </div>
             ))}
           </div>

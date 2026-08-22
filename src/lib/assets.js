@@ -18,6 +18,11 @@
  * It costs ~3× the bitrate, and it is the correct trade for this build.
  */
 function pickTier() {
+  // Lets a build pin one rendition regardless of device — used for the inline
+  // Vercel deploy, where only a single tier can be shipped through the API.
+  const forced = import.meta.env.VITE_FORCE_TIER
+  if (forced) return forced
+
   if (typeof window === 'undefined') return 'hd'
 
   const nav = navigator
