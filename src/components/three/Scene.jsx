@@ -5,7 +5,6 @@ import * as THREE from 'three'
 import { scrollStore } from '@/hooks/useScrollStore'
 import { pointer } from '@/hooks/usePointer'
 import { MarbleSphere, BrassRing, MaterialCube, GlassPlane, WireframeVilla, LightParticles } from './Objects'
-import ChairExplosion from './ChairExplosion'
 
 /**
  * ONE camera for the whole film.
@@ -100,7 +99,7 @@ export default function Scene({ cubeColorRef, buildRef }) {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-40"
+      className="pointer-events-none fixed inset-0 z-20"
       style={{ contain: 'strict' }}
       aria-hidden="true"
     >
@@ -147,11 +146,6 @@ export default function Scene({ cubeColorRef, buildRef }) {
 
           <Gate chapters={['blueprint']}>
             <WireframeVilla position={[0, -0.35, -1.2]} scale={0.72} buildRef={buildRef} />
-          </Gate>
-
-          {/* Chair explosion — visible only during the hero chapter */}
-          <Gate chapters={['hero']}>
-            <ChairExplosion />
           </Gate>
 
           {!mobile && <LightParticles count={reduced ? 120 : 420} />}
