@@ -29,7 +29,7 @@ export default function Finale() {
           trigger: root.current,
           start: 'top top',
           end: () => `+=${window.innerHeight * 1.3}`,
-          scrub: 1.3,
+          scrub: 0.7,
           invalidateOnRefresh: true,
         },
       })

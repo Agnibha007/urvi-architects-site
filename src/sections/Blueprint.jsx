@@ -45,7 +45,7 @@ export default function Blueprint({ buildRef }) {
           trigger: root.current,
           start: 'top top',
           end: () => `+=${window.innerHeight * 1.2}`,
-          scrub: 1.2,
+          scrub: 0.7,
           invalidateOnRefresh: true,
         },
       })

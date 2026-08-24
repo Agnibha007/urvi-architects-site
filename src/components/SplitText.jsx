@@ -56,7 +56,7 @@ export default function SplitText({
           trigger: trigger?.current ?? el,
           start,
           end: scrub ? 'bottom 40%' : undefined,
-          scrub: scrub ? 1.2 : false,
+          scrub: scrub ? 0.7 : false,
           once: once && !scrub,
           invalidateOnRefresh: true,
         },

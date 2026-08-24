@@ -31,7 +31,7 @@ export default function Bedroom() {
           trigger: root.current,
           start: 'top top',
           end: () => `+=${window.innerHeight * 1.2}`,
-          scrub: 1.25,
+          scrub: 0.7,
           invalidateOnRefresh: true,
         },
       })

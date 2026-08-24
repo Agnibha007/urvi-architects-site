@@ -34,7 +34,7 @@ export default function Kitchen() {
           trigger: root.current,
           start: 'top top',
           end: () => `+=${window.innerHeight * 2.2}`,
-          scrub: 1.15,
+          scrub: 0.7,
           invalidateOnRefresh: true,
         },
       })

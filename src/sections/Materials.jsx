@@ -45,7 +45,7 @@ export default function Materials({ cubeColorRef }) {
           trigger: root.current,
           start: 'top top',
           end: () => `+=${window.innerHeight * 1.4}`,
-          scrub: 1.2,
+          scrub: 0.7,
           invalidateOnRefresh: true,
         },
       })

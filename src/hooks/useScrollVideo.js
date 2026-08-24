@@ -29,7 +29,7 @@ export function useScrollVideo({
   onProgress,
 } = {}) {
   const videoRef = useRef(null)
-  const state = useRef({ target: 0, applied: -1, seeking: false, ready: false })
+  const state = useRef({ target: 0, applied: -1, ready: false })
 
   // start/end are frequently passed as inline arrow functions. Holding them in a
   // ref keeps them out of the dependency array — otherwise every parent render
@@ -76,25 +76,25 @@ export function useScrollVideo({
         /* noop */
       }
     }
-    const onSeeked = () => {
-      s.seeking = false
-    }
 
     video.addEventListener('loadedmetadata', onLoaded)
-    video.addEventListener('seeked', onSeeked)
 
-    /* ---- commit loop: one seek per frame, max ----------------------- */
+    /* ---- commit loop: every tick, no gate --------------------------- */
+    // Instead of waiting for one seek to resolve before starting the next,
+    // we write currentTime every tick. The browser discards in-flight seeks
+    // and jumps to the latest requested time — so every scroll stop lands
+    // on the correct frame, and fast scrolls never fall behind.
     const commit = () => {
-      if (!s.ready || s.seeking) return
+      if (!s.ready) return
       const duration = video.duration
       if (!duration || Number.isNaN(duration)) return
 
-      // Quantise to the source frame grid.
+      // Quantise to the source frame grid so micro-scrolls don't trigger
+      // redundant decodes that produce an identical picture.
       const wanted = Math.min(duration - frame, Math.max(0, Math.round(s.target * duration / frame) * frame))
       if (Math.abs(wanted - s.applied) < frame * 0.5) return
 
       s.applied = wanted
-      s.seeking = true
       video.currentTime = wanted
     }
 
@@ -122,7 +122,6 @@ export function useScrollVideo({
       st.kill()
       io.disconnect()
       video.removeEventListener('loadedmetadata', onLoaded)
-      video.removeEventListener('seeked', onSeeked)
       video.removeAttribute('src')
       // Must clear the guard too. React StrictMode mounts → unmounts → remounts
       // in development; without this reset the second mount sees `attached` still
@@ -130,7 +129,6 @@ export function useScrollVideo({
       delete video.dataset.attached
       s.ready = false
       s.applied = -1
-      s.seeking = false
       video.load()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

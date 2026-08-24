@@ -29,7 +29,7 @@ export default function Hero() {
           trigger: root.current,
           start: 'top top',
           end: () => `+=${window.innerHeight * 1.2}`,
-          scrub: 1.1,
+          scrub: 0.7,
           invalidateOnRefresh: true,
         },
       })

@@ -65,7 +65,7 @@ export default function Reveal({
           trigger: el,
           start,
           end: scrub ? 'bottom 45%' : undefined,
-          scrub: scrub ? 1.1 : false,
+          scrub: scrub ? 0.7 : false,
           once: !scrub,
           invalidateOnRefresh: true,
         },

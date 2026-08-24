@@ -34,7 +34,7 @@ export default function LivingRoom() {
           trigger: root.current,
           start: 'top top',
           end: () => `+=${window.innerHeight * 1.0}`,
-          scrub: 1.15,
+          scrub: 0.7,
           invalidateOnRefresh: true,
         },
       })
