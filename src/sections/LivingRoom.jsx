@@ -33,7 +33,7 @@ export default function LivingRoom() {
         scrollTrigger: {
           trigger: root.current,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 2.6}`,
+          end: () => `+=${window.innerHeight * 2.0}`,
           scrub: 1.15,
           invalidateOnRefresh: true,
         },
@@ -70,14 +70,14 @@ export default function LivingRoom() {
 
   return (
     <div ref={root}>
-      <Chapter id="living" length={2.6} darkness={0} background="#F7F5F2">
+      <Chapter id="living" length={2.0} darkness={0} background="#F7F5F2">
         <div ref={plate} className="absolute inset-0 will-move">
           <ScrollVideo
             src={VIDEOS.livingTable}
             poster={IMAGES.coffeeTable}
             trigger={root}
             start="top top"
-            end={() => `+=${window.innerHeight * 2.6}`}
+            end={() => `+=${window.innerHeight * 2.0}`}
             range={[0.04, 0.92]}
             className="h-full w-full"
           />
