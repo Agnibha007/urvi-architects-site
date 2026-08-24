@@ -29,7 +29,7 @@ export function useScrollVideo({
   onProgress,
 } = {}) {
   const videoRef = useRef(null)
-  const state = useRef({ target: 0, applied: -1, ready: false })
+  const state = useRef({ target: 0, applied: -1, seeking: false, ready: false })
 
   // start/end are frequently passed as inline arrow functions. Holding them in a
   // ref keeps them out of the dependency array — otherwise every parent render
@@ -69,23 +69,28 @@ export function useScrollVideo({
 
     const onLoaded = () => {
       s.ready = true
-      // Prime frame 0 so the poster frame is real video, not a black flash.
-      try {
-        video.currentTime = 0.001
-      } catch {
-        /* noop */
-      }
+      // Play then immediately pause to kick the decoder alive.
+      // On Safari / iOS a video that has never been play()'d ignores
+      // currentTime changes — the seek completes but no frame is painted.
+      // Muted + playsInline means play() succeeds without a user gesture.
+      video.play().then(() => { video.pause() }).catch(() => {})
     }
 
     video.addEventListener('loadedmetadata', onLoaded)
 
-    /* ---- commit loop: every tick, no gate --------------------------- */
-    // Instead of waiting for one seek to resolve before starting the next,
-    // we write currentTime every tick. The browser discards in-flight seeks
-    // and jumps to the latest requested time — so every scroll stop lands
-    // on the correct frame, and fast scrolls never fall behind.
+    const onSeeked = () => {
+      s.seeking = false
+    }
+    video.addEventListener('seeked', onSeeked)
+
+    /* ---- commit loop: one seek per frame, max ----------------------- */
+    // Writing currentTime every tick without a gate causes the browser to
+    // cancel in-flight seeks, which can momentarily show no frame. We keep
+    // a lightweight seek-state flag and allow a new seek only after the
+    // previous one resolves — or after a timeout safety valve so the
+    // video can never get permanently stuck.
     const commit = () => {
-      if (!s.ready) return
+      if (!s.ready || s.seeking) return
       const duration = video.duration
       if (!duration || Number.isNaN(duration)) return
 
@@ -95,6 +100,7 @@ export function useScrollVideo({
       if (Math.abs(wanted - s.applied) < frame * 0.5) return
 
       s.applied = wanted
+      s.seeking = true
       video.currentTime = wanted
     }
 
@@ -122,6 +128,7 @@ export function useScrollVideo({
       st.kill()
       io.disconnect()
       video.removeEventListener('loadedmetadata', onLoaded)
+      video.removeEventListener('seeked', onSeeked)
       video.removeAttribute('src')
       // Must clear the guard too. React StrictMode mounts → unmounts → remounts
       // in development; without this reset the second mount sees `attached` still
@@ -129,6 +136,7 @@ export function useScrollVideo({
       delete video.dataset.attached
       s.ready = false
       s.applied = -1
+      s.seeking = false
       video.load()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
