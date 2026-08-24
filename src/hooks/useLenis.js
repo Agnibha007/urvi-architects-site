@@ -12,14 +12,14 @@ export function useLenis() {
 
     const isMobile = window.innerWidth < 768
     const lenis = new Lenis({
-      duration: isMobile ? 0.9 : 1.25,
-      // Long, decelerating tail — the "heavy object slowing down" feel.
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: isMobile ? 0.6 : 0.8,
+      // Gentle ease-out — light and responsive, no heavy tail.
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -8 * t)),
       smoothWheel: !isMobile,
       syncTouch: true,
-      syncTouchLerp: isMobile ? 0.12 : 0.09,
-      touchInertiaMultiplier: isMobile ? 16 : 24,
-      wheelMultiplier: isMobile ? 1.1 : 0.9,
+      syncTouchLerp: isMobile ? 0.15 : 0.12,
+      touchInertiaMultiplier: isMobile ? 10 : 14,
+      wheelMultiplier: isMobile ? 1.2 : 1.0,
       lerp: null,
     })
 
