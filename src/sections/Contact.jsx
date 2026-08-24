@@ -76,7 +76,7 @@ export default function Contact() {
             <SplitText by="char" stagger={0.018} duration={1.1}>
               studio@urviarchitects.com
             </SplitText>
-            <FiArrowUpRight className="mt-2 shrink-0 text-accent transition-transform duration-700 ease-apple group-hover:translate-x-1 group-hover:-translate-y-1" />
+            <FiArrowUpRight className="mt-2 shrink-0 text-accent transition-transform duration-1000 ease-subtle group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </div>
 
@@ -90,7 +90,7 @@ export default function Contact() {
             Italia
           </p>
           <p className="body-sm mt-4 sm:mt-5 text-ink/70">
-            <a href="tel:+390612345678" className="pointer-events-auto transition-colors duration-500 hover:text-accent">
+            <a href="tel:+390612345678" className="pointer-events-auto transition-colors duration-700 ease-subtle hover:text-accent">
               +39 06 1234 5678
             </a>
           </p>
@@ -103,7 +103,7 @@ export default function Contact() {
               key={label}
               href={href}
               onClick={(e) => go(e, href)}
-              className="pointer-events-auto body-sm block py-1 text-ink/70 transition-colors duration-500 hover:text-accent"
+              className="pointer-events-auto body-sm block py-1 text-ink/70 transition-colors duration-700 ease-subtle hover:text-accent"
             >
               {label}
             </a>
@@ -133,7 +133,7 @@ export default function Contact() {
               href={href}
               target="_blank"
               rel="noreferrer noopener"
-              className="pointer-events-auto eyebrow group inline-flex items-center gap-2 text-ink/55 transition-colors duration-500 hover:text-accent"
+              className="pointer-events-auto eyebrow group inline-flex items-center gap-2 text-ink/55 transition-colors duration-700 ease-subtle hover:text-accent"
             >
               <Icon className="text-[13px]" />
               {label}
@@ -143,7 +143,7 @@ export default function Contact() {
 
         <button
           onClick={(e) => go(e, '#hero')}
-          className="pointer-events-auto eyebrow text-left text-ink/50 transition-colors duration-500 hover:text-accent md:text-right"
+          className="pointer-events-auto eyebrow text-left text-ink/50 transition-colors duration-700 ease-subtle hover:text-accent md:text-right"
         >
           Return to the beginning ↑
         </button>

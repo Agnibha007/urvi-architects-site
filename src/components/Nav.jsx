@@ -59,7 +59,7 @@ export default function Nav() {
       <button
         onClick={() => go('hero')}
         className="pointer-events-auto absolute left-4 top-4 sm:left-6 sm:top-6 md:left-12 md:top-8"
-        style={{ color: 'var(--chrome)', transition: 'color 900ms var(--ease-apple)' }}
+        style={{ color: 'var(--chrome)', transition: 'color 1200ms var(--ease-subtle)' }}
       >
         <span className="font-display text-[13px] sm:text-[15px] md:text-[17px] leading-none tracking-[0.14em]">
           URVI
@@ -84,8 +84,8 @@ export default function Nav() {
                 className="font-sans text-[10px] uppercase tracking-micro"
                 style={{
                   opacity: on ? 0.9 : 0,
-                  transform: on ? 'translateX(0)' : 'translateX(6px)',
-                  transition: 'opacity 800ms var(--ease-apple), transform 800ms var(--ease-apple)',
+                  transform: on ? 'translateX(0)' : 'translateX(3px)',
+                  transition: 'opacity 1000ms var(--ease-subtle), transform 1000ms var(--ease-subtle)',
                 }}
               >
                 {label}
@@ -93,9 +93,9 @@ export default function Nav() {
               <span
                 className="block h-[1px] bg-current"
                 style={{
-                  width: on ? 34 : 14,
+                  width: on ? 32 : 16,
                   opacity: on ? 0.9 : 0.28,
-                  transition: 'width 900ms var(--ease-apple), opacity 900ms var(--ease-apple)',
+                  transition: 'width 1200ms var(--ease-subtle), opacity 1200ms var(--ease-subtle)',
                 }}
               />
             </button>
@@ -111,7 +111,7 @@ export default function Nav() {
           go('contact')
         }}
         className="pointer-events-auto absolute right-4 top-4 sm:right-6 sm:top-6 md:right-12 md:top-8 font-sans text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-micro"
-        style={{ color: 'var(--chrome)', transition: 'color 900ms var(--ease-apple)' }}
+        style={{ color: 'var(--chrome)', transition: 'color 1200ms var(--ease-subtle)' }}
       >
         Enquire
       </a>

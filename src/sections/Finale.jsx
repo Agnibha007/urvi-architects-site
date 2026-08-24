@@ -107,7 +107,7 @@ export default function Finale() {
                     : document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' })
                 }}
               >
-                <span className="display-md text-white transition-[letter-spacing] duration-700 ease-apple group-hover:tracking-[-0.02em]">
+                <span className="display-md text-white transition-[letter-spacing] duration-1000 ease-subtle group-hover:tracking-[-0.01em]">
                   Start Your Project
                 </span>
                 <span

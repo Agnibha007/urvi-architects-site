@@ -69,6 +69,7 @@
   --secondary: #d8cec0;
   --dark: #101010;
   --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-subtle: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 @layer base {

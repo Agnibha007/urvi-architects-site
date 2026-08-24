@@ -140,7 +140,7 @@ export default function Preloader({ onDone }) {
       <div ref={bar} className="h-[1.5px] w-full bg-ink/10 will-move">
         <div
           className="h-full origin-left bg-accent"
-          style={{ transform: `scaleX(${n / 100})`, transition: 'transform 400ms var(--ease-apple)' }}
+          style={{ transform: `scaleX(${n / 100})`, transition: 'transform 600ms var(--ease-subtle)' }}
         />
       </div>
     </div>

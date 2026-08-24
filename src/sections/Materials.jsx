@@ -93,9 +93,9 @@ export default function Materials({ cubeColorRef }) {
                   key={m.name}
                   className="will-move border-t border-ink/12 py-2.5 sm:py-3.5 md:py-5"
                   style={{
-                    transition: 'opacity 900ms var(--ease-apple), transform 900ms var(--ease-apple)',
+                    transition: 'opacity 1200ms var(--ease-subtle), transform 1200ms var(--ease-subtle)',
                     opacity: on ? 1 : 0.26,
-                    transform: on ? 'translate3d(0,0,0)' : 'translate3d(-8px,0,0)',
+                    transform: on ? 'translate3d(0,0,0)' : 'translate3d(-4px,0,0)',
                   }}
                 >
                   <div className="flex items-baseline justify-between gap-3 sm:gap-6">
@@ -105,8 +105,8 @@ export default function Materials({ cubeColorRef }) {
                         className="!text-[clamp(1.2rem,4.2vw,3.4rem)] font-display leading-none"
                         style={{
                           color: on ? '#151515' : '#151515',
-                          transition: 'letter-spacing 900ms var(--ease-apple)',
-                          letterSpacing: on ? '-0.03em' : '-0.045em',
+                          transition: 'letter-spacing 1200ms var(--ease-subtle)',
+                          letterSpacing: on ? '-0.03em' : '-0.04em',
                         }}
                       >
                         {m.name}
@@ -116,8 +116,8 @@ export default function Materials({ cubeColorRef }) {
                       className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 rounded-full ring-1 ring-ink/10"
                       style={{
                         background: m.hex,
-                        transform: on ? 'scale(1)' : 'scale(0.5)',
-                        transition: 'transform 900ms var(--ease-apple)',
+                        transform: on ? 'scale(1)' : 'scale(0.6)',
+                        transition: 'transform 1200ms var(--ease-subtle)',
                       }}
                     />
                   </div>
@@ -125,7 +125,7 @@ export default function Materials({ cubeColorRef }) {
                     className="grid overflow-hidden will-move"
                     style={{
                       gridTemplateRows: on ? '1fr' : '0fr',
-                      transition: 'grid-template-rows 900ms var(--ease-apple)',
+                      transition: 'grid-template-rows 1200ms var(--ease-subtle)',
                       willChange: 'grid-template-rows',
                     }}
                   >
