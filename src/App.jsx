@@ -31,15 +31,19 @@ export default function App() {
   useScrollStore()
   useLenis()
 
+  const sceneTimer = useRef(null)
+
   const onLoaded = useCallback(() => {
     setReady(true)
     // Give the browser one idle slot to settle layout before measuring pins.
     requestAnimationFrame(() => ScrollTrigger.refresh())
     // The canvas mounts after the curtain — the opening should never compete
     // with WebGL context creation for the main thread.
-    const id = window.setTimeout(() => setShowScene(true), 900)
-    return () => window.clearTimeout(id)
+    sceneTimer.current = window.setTimeout(() => setShowScene(true), 900)
   }, [])
+
+  // Clean up the scene-mount timer if the component unmounts before it fires.
+  useEffect(() => () => { if (sceneTimer.current) window.clearTimeout(sceneTimer.current) }, [])
 
   // Lock scroll until the overture ends.
   useEffect(() => {

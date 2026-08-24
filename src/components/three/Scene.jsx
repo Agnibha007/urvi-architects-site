@@ -1,4 +1,4 @@
-import { Suspense, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { AdaptiveDpr, AdaptiveEvents, Preload } from '@react-three/drei'
 import * as THREE from 'three'
@@ -24,14 +24,15 @@ const SHOTS = {
   contact: { pos: [0, -0.4, 9.0], look: [0, 0, 0], fov: 48 },
 }
 
-function CameraRig({ reduced }) {
+function CameraRig({ reducedRef }) {
   const { camera } = useThree()
   const look = useRef(new THREE.Vector3())
   const target = useRef(new THREE.Vector3())
+  const _lookTarget = useRef(new THREE.Vector3())
 
   useFrame((_, dt) => {
     const shot = SHOTS[scrollStore.section] ?? SHOTS.hero
-    const amp = reduced ? 0.25 : 1
+    const amp = reducedRef.current ? 0.25 : 1
 
     // Chapter dolly + a small continuous push driven by progress within it.
     target.current.set(
@@ -44,7 +45,8 @@ function CameraRig({ reduced }) {
     camera.position.y = THREE.MathUtils.damp(camera.position.y, target.current.y, 1.6, dt)
     camera.position.z = THREE.MathUtils.damp(camera.position.z, target.current.z, 1.6, dt)
 
-    look.current.lerp(new THREE.Vector3(...shot.look), 1 - Math.exp(-1.8 * dt))
+    _lookTarget.current.set(...shot.look)
+    look.current.lerp(_lookTarget.current, 1 - Math.exp(-1.8 * dt))
     camera.lookAt(look.current)
 
     const fov = THREE.MathUtils.damp(camera.fov, shot.fov, 1.6, dt)
@@ -93,9 +95,29 @@ function LightShafts() {
   )
 }
 
+function useMediaFlags() {
+  const reducedRef = useRef(typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const mobileRef = useRef(typeof window !== 'undefined' && window.innerWidth < 768)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const onMQ = () => { reducedRef.current = mq.matches }
+    mq.addEventListener('change', onMQ)
+
+    const onResize = () => { mobileRef.current = window.innerWidth < 768 }
+    window.addEventListener('resize', onResize, { passive: true })
+
+    return () => {
+      mq.removeEventListener('change', onMQ)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+
+  return { reduced: reducedRef, mobile: mobileRef }
+}
+
 export default function Scene({ cubeColorRef, buildRef }) {
-  const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const mobile = typeof window !== 'undefined' && window.innerWidth < 768
+  const { reduced: reducedRef, mobile: mobileRef } = useMediaFlags()
 
   return (
     <div
@@ -104,9 +126,9 @@ export default function Scene({ cubeColorRef, buildRef }) {
       aria-hidden="true"
     >
       <Canvas
-        dpr={[1, mobile ? 1.5 : 2]}
+        dpr={[1, mobileRef.current ? 1.5 : 2]}
         gl={{
-          antialias: !mobile,
+          antialias: !mobileRef.current,
           alpha: true,
           powerPreference: 'high-performance',
           stencil: false,
@@ -122,7 +144,7 @@ export default function Scene({ cubeColorRef, buildRef }) {
           gl.outputColorSpace = THREE.SRGBColorSpace
         }}
       >
-        <CameraRig reduced={reduced} />
+        <CameraRig reducedRef={reducedRef} />
 
         <Suspense fallback={null}>
           {/* Chapter-anchored objects. They live at fixed world positions;
@@ -148,7 +170,7 @@ export default function Scene({ cubeColorRef, buildRef }) {
             <WireframeVilla position={[0, -0.35, -1.2]} scale={0.72} buildRef={buildRef} />
           </Gate>
 
-          {!mobile && <LightParticles count={reduced ? 120 : 420} />}
+          {!mobileRef.current && <LightParticles count={reducedRef.current ? 120 : 420} />}
           <LightShafts />
 
           <Preload all />

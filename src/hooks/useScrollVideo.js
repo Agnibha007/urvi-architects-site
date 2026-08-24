@@ -102,7 +102,7 @@ export function useScrollVideo({
 
     /* ---- scroll binding --------------------------------------------- */
     const [rIn, rOut] = cfg.current.range
-    const span = rOut - rIn
+    const span = Math.max(rOut - rIn, 0.0001)
 
     const st = ScrollTrigger.create({
       trigger: cfg.current.trigger?.current ?? video.parentElement,

@@ -10,47 +10,51 @@ import { gsap } from '@/lib/gsap'
  */
 const pointer = { x: 0, y: 0, rx: 0, ry: 0, active: false }
 
-let bound = false
+export function usePointer() {
+  const ref = useRef(pointer)
 
-function bind() {
-  if (bound || typeof window === 'undefined') return
-  bound = true
-
-  const onMove = (e) => {
-    pointer.rx = (e.clientX / window.innerWidth) * 2 - 1
-    pointer.ry = (e.clientY / window.innerHeight) * 2 - 1
-    pointer.active = true
-  }
-  const onLeave = () => {
-    pointer.active = false
-    pointer.rx = 0
-    pointer.ry = 0
-  }
-  const onTouchEnd = () => {
-    // Mobile: pointerleave never fires on finger lift. Reset after a short
-    // delay so parallax has time to damp back to center.
-    setTimeout(() => {
+  useEffect(() => {
+    const onMove = (e) => {
+      pointer.rx = (e.clientX / window.innerWidth) * 2 - 1
+      pointer.ry = (e.clientY / window.innerHeight) * 2 - 1
+      pointer.active = true
+    }
+    const onLeave = () => {
       pointer.active = false
       pointer.rx = 0
       pointer.ry = 0
-    }, 180)
-  }
+    }
+    const onTouchEnd = () => {
+      // Mobile: pointerleave never fires on finger lift. Reset after a short
+      // delay so parallax has time to damp back to center.
+      setTimeout(() => {
+        pointer.active = false
+        pointer.rx = 0
+        pointer.ry = 0
+      }, 180)
+    }
 
-  window.addEventListener('pointermove', onMove, { passive: true })
-  window.addEventListener('pointerleave', onLeave, { passive: true })
-  window.addEventListener('pointercancel', onLeave, { passive: true })
-  window.addEventListener('touchend', onTouchEnd, { passive: true })
+    window.addEventListener('pointermove', onMove, { passive: true })
+    window.addEventListener('pointerleave', onLeave, { passive: true })
+    window.addEventListener('pointercancel', onLeave, { passive: true })
+    window.addEventListener('touchend', onTouchEnd, { passive: true })
 
-  // Critically damped follow — the "expensive" feel comes from the lag.
-  gsap.ticker.add(() => {
-    pointer.x += (pointer.rx - pointer.x) * 0.055
-    pointer.y += (pointer.ry - pointer.y) * 0.055
-  })
-}
+    // Critically damped follow — the "expensive" feel comes from the lag.
+    const dampTick = () => {
+      pointer.x += (pointer.rx - pointer.x) * 0.055
+      pointer.y += (pointer.ry - pointer.y) * 0.055
+    }
+    gsap.ticker.add(dampTick)
 
-export function usePointer() {
-  const ref = useRef(pointer)
-  useEffect(bind, [])
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerleave', onLeave)
+      window.removeEventListener('pointercancel', onLeave)
+      window.removeEventListener('touchend', onTouchEnd)
+      gsap.ticker.remove(dampTick)
+    }
+  }, [])
+
   return ref
 }
 
