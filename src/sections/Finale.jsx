@@ -28,7 +28,7 @@ export default function Finale() {
         scrollTrigger: {
           trigger: root.current,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 2.7}`,
+          end: () => `+=${window.innerHeight * 1.3}`,
           scrub: 1.3,
           invalidateOnRefresh: true,
         },
@@ -58,14 +58,14 @@ export default function Finale() {
 
   return (
     <div ref={root}>
-      <Chapter id="finale" length={2.7} darkness={0.15} background="#F7F5F2">
+      <Chapter id="finale" length={1.3} darkness={0.15} background="#F7F5F2">
         <div ref={plate} className="absolute inset-0 will-move">
           <ScrollVideo
             src={VIDEOS.villaAssembly}
             poster={IMAGES.villaModel}
             trigger={root}
             start="top top"
-            end={() => `+=${window.innerHeight * 2.7}`}
+            end={() => `+=${window.innerHeight * 1.3}`}
             range={[0.02, 0.94]}
             className="h-full w-full"
           />

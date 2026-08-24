@@ -30,7 +30,7 @@ export default function Bedroom() {
         scrollTrigger: {
           trigger: root.current,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 2.4}`,
+          end: () => `+=${window.innerHeight * 1.2}`,
           scrub: 1.25,
           invalidateOnRefresh: true,
         },
@@ -63,7 +63,7 @@ export default function Bedroom() {
 
   return (
     <div ref={root}>
-      <Chapter id="bedroom" length={2.4} darkness={0.45} background="#EDE8E1">
+      <Chapter id="bedroom" length={1.2} darkness={0.45} background="#EDE8E1">
         {/* Bed assembly */}
         <div ref={bedPlate} className="absolute inset-0 will-move">
           <ScrollVideo
@@ -71,7 +71,7 @@ export default function Bedroom() {
             poster={IMAGES.kingBed}
             trigger={root}
             start="top top"
-            end={() => `+=${window.innerHeight * 2.4}`}
+            end={() => `+=${window.innerHeight * 1.2}`}
             range={[0.02, 0.56]}
             className="h-full w-full"
           />
@@ -83,7 +83,7 @@ export default function Bedroom() {
             src={VIDEOS.pendantLight}
             trigger={root}
             start="top top"
-            end={() => `+=${window.innerHeight * 2.4}`}
+            end={() => `+=${window.innerHeight * 1.2}`}
             range={[0.5, 0.98]}
             className="h-full w-full"
           />
