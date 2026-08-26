@@ -4,23 +4,13 @@ import Chapter from '@/components/Chapter'
 import ScrollVideo from '@/components/ScrollVideo'
 import { VIDEOS, IMAGES } from '@/lib/assets'
 
-const LABELS = [
-  { t: 'A—01', d: 'Entrance court', x: '12%', y: '26%' },
-  { t: 'A—04', d: 'Living volume', x: '34%', y: '58%' },
-  { t: 'B—02', d: 'Cross wing', x: '68%', y: '34%' },
-  { t: 'B—07', d: 'Colonnade, 7 bays', x: '54%', y: '78%' },
-  { t: 'C—01', d: 'Roof plane, +6.20', x: '82%', y: '18%' },
-]
-
 /**
- * BLUEPRINT.
+ * APPROACH / PROCESS — the architectural drawing as metaphor for design thinking.
  *
  * The world goes dark here. The video carries the extrusion; the R3F
  * `WireframeVilla` is gated to this chapter and its GLSL build-sweep is driven
- * by the same scroll progress, so the drawing on screen and the massing model
- * in 3D construct themselves on the same clock.
- *
- * Everything overlaid is drafting-table language: rules, ticks, sheet numbers.
+ * by the same scroll progress. The editorial framing presents this as the
+ * studio's design process — from concept to construction.
  */
 export default function Blueprint({ buildRef }) {
   const root = useRef(null)
@@ -30,6 +20,7 @@ export default function Blueprint({ buildRef }) {
   const labels = useRef(null)
   const title = useRef(null)
   const rule = useRef(null)
+  const desc = useRef(null)
 
   const onProgress = useCallback(
     (p) => {
@@ -58,7 +49,7 @@ export default function Blueprint({ buildRef }) {
       tl.to(plate.current, { scale: 1.08, ease: 'none' }, 0.55)
 
       // Drafting grid draws itself in.
-      tl.fromTo(grid.current, { opacity: 0, scale: 1.1 }, { opacity: 0.22, scale: 1, ease: 'none', duration: 0.26 }, 0.06)
+      tl.fromTo(grid.current, { opacity: 0, scale: 1.1 }, { opacity: 0.18, scale: 1, ease: 'none', duration: 0.26 }, 0.06)
 
       // Measurement rule extends.
       tl.fromTo(rule.current, { scaleX: 0 }, { scaleX: 1, ease: 'apple', duration: 0.3 }, 0.14)
@@ -71,13 +62,16 @@ export default function Blueprint({ buildRef }) {
         0.1
       )
 
+      // Description arrives.
+      tl.fromTo(desc.current, { yPercent: 20, opacity: 0, filter: 'blur(6px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.22)
+
       // Labels clip in from the left — drafting-table tick marks.
       Array.from(labels.current.children).forEach((child, i) => {
         tl.fromTo(
           child,
           { clipPath: 'inset(0% 100% 0% 0%)', opacity: 0 },
           { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, ease: 'apple', duration: 0.18, delay: i * 0.07 },
-          0.24
+          0.28
         )
       })
 
@@ -122,38 +116,52 @@ export default function Blueprint({ buildRef }) {
 
         {/* Technical labels — hidden on mobile, visible on md+ */}
         <div ref={labels} className="pointer-events-none absolute inset-0 z-30 hidden md:block">
-          {LABELS.map((l) => (
-            <div key={l.t} className="absolute will-move" style={{ left: l.x, top: l.y }}>
-              <span className="block h-[7px] w-[7px] -translate-x-1/2 rounded-full border border-[#9FD6E8] bg-[#9FD6E8]/25" />
-              <span className="mt-2 block h-[1px] w-14 bg-[#9FD6E8]/45" />
-              <p className="eyebrow mt-1.5 text-[#9FD6E8]/90">{l.t}</p>
-              <p className="font-sans text-[10px] font-light tracking-wide text-[#9FD6E8]/60">{l.d}</p>
+          {[
+            { t: 'I', d: 'Concept' },
+            { t: 'II', d: 'Schematic' },
+            { t: 'III', d: 'Detail' },
+            { t: 'IV', d: 'Construction' },
+            { t: 'V', d: 'Completion' },
+          ].map((l, i) => (
+            <div
+              key={l.t}
+              className="absolute will-move"
+              style={{
+                left: `${14 + i * 16}%`,
+                top: i % 2 === 0 ? '22%' : '68%',
+              }}
+            >
+              <span className="block h-[7px] w-[7px] -translate-x-1/2 rounded-full border border-[#9FD6E8] bg-[#9FD6E8]/20" />
+              <span className="mt-2 block h-[1px] w-10 bg-[#9FD6E8]/35" />
+              <p className="eyebrow mt-1.5 text-[#9FD6E8]/80">{l.t}</p>
+              <p className="font-sans text-[10px] font-light tracking-wide text-[#9FD6E8]/50">{l.d}</p>
             </div>
           ))}
         </div>
 
         <div className="pointer-events-none relative z-40 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
           <div className="flex items-start justify-between">
-            <span className="eyebrow text-[#9FD6E8]/60">05 — Drawing Set</span>
-            <span className="eyebrow hidden sm:inline text-[#9FD6E8]/50">Sheet A—101 / Scale 1:100</span>
+            <span className="eyebrow text-[#9FD6E8]/50">03</span>
+            <span className="eyebrow hidden sm:inline text-[#9FD6E8]/40">Approach &amp; Process</span>
           </div>
 
-          <div ref={title} className="max-w-[44rem] will-move">
-            <h2 className="display-lg text-[#F0F4F5]">
-              Before a room,
-              <br />
-              <span className="italic text-[#9FD6E8]">a line.</span>
-            </h2>
-            <div ref={rule} className="mt-6 sm:mt-8 h-[1px] w-full max-w-md origin-left bg-[#9FD6E8]/40 will-move" />
+          <div className="max-w-[44rem]">
+            <div ref={title} className="will-move">
+              <h2 className="display-lg text-[#F0F4F5]">
+                From line
+                <br />
+                <span className="italic text-[#9FD6E8]">to lived space.</span>
+              </h2>
+              <div ref={rule} className="mt-6 sm:mt-8 h-[1px] w-full max-w-md origin-left bg-[#9FD6E8]/35 will-move" />
+            </div>
           </div>
 
-          {/* Mobile: stack. Desktop: row. */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-            <p className="body-sm max-w-[34ch] text-[#9FD6E8]/50">
-              Every villa exists twice — once as geometry, once as weather. We draw the first so
-              carefully that the second can be left alone.
+          <div ref={desc} className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8 will-move">
+            <p className="body-sm max-w-[34ch] text-[#9FD6E8]/45">
+              Every project begins as geometry and becomes weather. We draw the first so carefully
+              that the second can be left alone.
             </p>
-            <span className="eyebrow hidden md:block text-[#9FD6E8]/45">GFA 412 m² / Plot 1,840 m²</span>
+            <span className="eyebrow hidden md:block text-[#9FD6E8]/40">GFA 412 m² / Plot 1,840 m²</span>
           </div>
         </div>
       </Chapter>

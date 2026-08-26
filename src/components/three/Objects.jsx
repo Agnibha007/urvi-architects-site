@@ -19,11 +19,11 @@ export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
     mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, dt)
 
     const m = mesh.current
-    // Slow tumble + very small pointer parallax. Never more than a few degrees.
-    m.rotation.y += dt * 0.075
-    m.rotation.x = damp(m.rotation.x, pointer.y * 0.10, 1.6, dt)
-    m.position.x = damp(m.position.x, position[0] + pointer.x * 0.22, 1.4, dt)
-    m.position.y = damp(m.position.y, position[1] + Math.sin(t * 0.5 + phase) * 0.14 - pointer.y * 0.14, 1.4, dt)
+    // Slow tumble + very subtle pointer parallax. Restrained for architectural feel.
+    m.rotation.y += dt * 0.06
+    m.rotation.x = damp(m.rotation.x, pointer.y * 0.07, 1.6, dt)
+    m.position.x = damp(m.position.x, position[0] + pointer.x * 0.15, 1.4, dt)
+    m.position.y = damp(m.position.y, position[1] + Math.sin(t * 0.4 + phase) * 0.12 - pointer.y * 0.1, 1.4, dt)
   })
 
   return (
@@ -44,10 +44,10 @@ export function BrassRing({ position = [0, 0, 0], scale = 1, phase = 1.2 }) {
     mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, dt)
 
     const m = mesh.current
-    m.rotation.z += dt * 0.11
-    m.rotation.x = damp(m.rotation.x, 0.85 + pointer.y * 0.14, 1.5, dt)
-    m.rotation.y = damp(m.rotation.y, pointer.x * 0.22, 1.5, dt)
-    m.position.y = position[1] + Math.sin(t * 0.42 + phase) * 0.2
+    m.rotation.z += dt * 0.09
+    m.rotation.x = damp(m.rotation.x, 0.85 + pointer.y * 0.1, 1.5, dt)
+    m.rotation.y = damp(m.rotation.y, pointer.x * 0.16, 1.5, dt)
+    m.position.y = position[1] + Math.sin(t * 0.36 + phase) * 0.16
   })
 
   return (
@@ -71,10 +71,10 @@ export function MaterialCube({ position = [0, 0, 0], scale = 1, colorRef }) {
     mat.uniforms.uBase.value.lerp(target, 1 - Math.exp(-2.2 * dt))
 
     const g = group.current
-    // Driven by scroll within the materials chapter, plus a mouse nudge.
-    g.rotation.y = damp(g.rotation.y, scrollStore.local * Math.PI * 2 + pointer.x * 0.28, 2.4, dt)
-    g.rotation.x = damp(g.rotation.x, -0.18 + pointer.y * 0.16, 2.0, dt)
-    g.position.y = position[1] + Math.sin(t * 0.55) * 0.08
+    // Driven by scroll within the materials chapter, plus a subtle mouse nudge.
+    g.rotation.y = damp(g.rotation.y, scrollStore.local * Math.PI * 2 + pointer.x * 0.18, 2.4, dt)
+    g.rotation.x = damp(g.rotation.x, -0.18 + pointer.y * 0.1, 2.0, dt)
+    g.position.y = position[1] + Math.sin(t * 0.45) * 0.06
   })
 
   return (
@@ -102,9 +102,9 @@ export function GlassPlane({ position = [0, 0, 0], rotation = [0, 0, 0], size = 
     mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, dt)
 
     const m = mesh.current
-    m.rotation.y = damp(m.rotation.y, rotation[1] + pointer.x * 0.2, 1.2, dt)
-    m.rotation.x = damp(m.rotation.x, rotation[0] + pointer.y * 0.1, 1.2, dt)
-    m.position.y = position[1] + Math.sin(t * 0.33 + phase) * 0.16
+    m.rotation.y = damp(m.rotation.y, rotation[1] + pointer.x * 0.12, 1.2, dt)
+    m.rotation.x = damp(m.rotation.x, rotation[0] + pointer.y * 0.06, 1.2, dt)
+    m.position.y = position[1] + Math.sin(t * 0.28 + phase) * 0.12
   })
 
   return (
@@ -142,8 +142,8 @@ export function WireframeVilla({ position = [0, 0, 0], scale = 1, buildRef }) {
     if (buildRef) mat.uniforms.uBuild.value = damp(mat.uniforms.uBuild.value, buildRef.current, 4, dt)
 
     const g = group.current
-    g.rotation.y = damp(g.rotation.y, -0.55 + pointer.x * 0.3 + (buildRef?.current ?? 0) * 0.9, 1.6, dt)
-    g.rotation.x = damp(g.rotation.x, 0.16 + pointer.y * 0.1, 1.6, dt)
+    g.rotation.y = damp(g.rotation.y, -0.55 + pointer.x * 0.2 + (buildRef?.current ?? 0) * 0.7, 1.6, dt)
+    g.rotation.x = damp(g.rotation.x, 0.16 + pointer.y * 0.06, 1.6, dt)
   })
 
   return (
@@ -238,7 +238,7 @@ export function LightParticles({ count = 420 }) {
     material.uniforms.uTime.value = performance.now() / 1000
     material.uniforms.uDark.value = damp(material.uniforms.uDark.value, scrollStore.darkness, 2, dt)
     material.uniforms.uPointer.value.set(pointer.x, pointer.y)
-    points.current.rotation.y += dt * 0.008
+    points.current.rotation.y += dt * 0.005
   })
 
   return <points ref={points} geometry={geometry} material={material} />

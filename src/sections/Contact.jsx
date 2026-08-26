@@ -19,11 +19,10 @@ const SOCIAL = [
 ]
 
 /**
- * CONTACT.
+ * CONTACT — studio information, clean and spacious.
  *
- * Not pinned — after ninety seconds of held frames the reader should be
- * released. The wordmark is the last piece of motion in the film: it draws
- * itself up from a mask as the page bottoms out.
+ * Not pinned — after the held film the reader should be released.
+ * Editorial layout with generous whitespace and minimal decoration.
  */
 export default function Contact() {
   const root = useRef(null)
@@ -64,51 +63,55 @@ export default function Contact() {
 
   return (
     <footer ref={root} id="contact" className="relative z-30 bg-bone px-5 sm:px-6 pb-8 sm:pb-10 pt-[12vh] sm:pt-[18vh] md:px-12 md:pb-14">
-      {/* Address block — stacks on mobile, grid on desktop */}
-      <div className="pointer-events-none mx-auto grid max-w-[1400px] grid-cols-1 gap-x-10 gap-y-10 sm:gap-y-14 border-t border-ink/12 pt-10 sm:pt-12 md:grid-cols-12 md:pt-16">
-        <div className="md:col-span-5">
-          <p className="eyebrow mb-4 sm:mb-6 text-ink/50">Enquiries</p>
-          <a
-            href="mailto:studio@urviarchitects.com"
-            className="pointer-events-auto group inline-flex items-start gap-2 text-ink break-all sm:break-normal"
-            style={{ fontSize: 'clamp(1.4rem, 2.8vw, 3rem)', lineHeight: 1.1, letterSpacing: '-0.03em' }}
-          >
-            <SplitText by="char" stagger={0.018} duration={1.1}>
-              studio@urviarchitects.com
-            </SplitText>
-            <FiArrowUpRight className="mt-2 shrink-0 text-accent transition-transform duration-1000 ease-subtle group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </a>
-        </div>
-
-        <Reveal variant="lines" className="md:col-span-3 md:col-start-7" stagger={0.1}>
-          <p className="eyebrow mb-4 sm:mb-6 text-ink/50">Studio</p>
-          <p className="body-sm text-ink/70">
-            Via dei Coronari 148
-            <br />
-            00186 Roma RM
-            <br />
-            Italia
-          </p>
-          <p className="body-sm mt-4 sm:mt-5 text-ink/70">
-            <a href="tel:+390612345678" className="pointer-events-auto transition-colors duration-700 ease-subtle hover:text-accent">
-              +39 06 1234 5678
-            </a>
-          </p>
-        </Reveal>
-
-        <Reveal variant="lines" className="md:col-span-2 md:col-start-11" stagger={0.1}>
-          <p className="eyebrow mb-4 sm:mb-6 text-ink/50">Index</p>
-          {NAV.map(([label, href]) => (
+      <div className="pointer-events-none mx-auto max-w-[1400px] border-t border-ink/8 pt-10 sm:pt-12 md:pt-16">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:gap-y-14 md:grid-cols-12">
+          {/* Enquiries */}
+          <div className="md:col-span-5">
+            <p className="eyebrow mb-4 sm:mb-6 text-ink/40">Enquiries</p>
             <a
-              key={label}
-              href={href}
-              onClick={(e) => go(e, href)}
-              className="pointer-events-auto body-sm block py-1 text-ink/70 transition-colors duration-700 ease-subtle hover:text-accent"
+              href="mailto:studio@urviarchitects.com"
+              className="pointer-events-auto group inline-flex items-start gap-2 text-ink break-all sm:break-normal"
+              style={{ fontSize: 'clamp(1.4rem, 2.8vw, 3rem)', lineHeight: 1.1, letterSpacing: '-0.03em' }}
             >
-              {label}
+              <SplitText by="char" stagger={0.018} duration={1.1}>
+                studio@urviarchitects.com
+              </SplitText>
+              <FiArrowUpRight className="mt-2 shrink-0 text-accent transition-transform duration-1000 ease-subtle group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
-          ))}
-        </Reveal>
+          </div>
+
+          {/* Studio */}
+          <Reveal variant="lines" className="md:col-span-3 md:col-start-7" stagger={0.1}>
+            <p className="eyebrow mb-4 sm:mb-6 text-ink/40">Studio</p>
+            <p className="body-sm text-ink/60">
+              Via dei Coronari 148
+              <br />
+              00186 Roma RM
+              <br />
+              Italia
+            </p>
+            <p className="body-sm mt-4 sm:mt-5 text-ink/60">
+              <a href="tel:+390612345678" className="pointer-events-auto transition-colors duration-700 ease-subtle hover:text-accent">
+                +39 06 1234 5678
+              </a>
+            </p>
+          </Reveal>
+
+          {/* Index */}
+          <Reveal variant="lines" className="md:col-span-2 md:col-start-11" stagger={0.1}>
+            <p className="eyebrow mb-4 sm:mb-6 text-ink/40">Index</p>
+            {NAV.map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                onClick={(e) => go(e, href)}
+                className="pointer-events-auto body-sm block py-1 text-ink/60 transition-colors duration-700 ease-subtle hover:text-accent"
+              >
+                {label}
+              </a>
+            ))}
+          </Reveal>
+        </div>
       </div>
 
       {/* Wordmark — responsive font size */}
@@ -123,8 +126,8 @@ export default function Contact() {
       </div>
 
       {/* Base rule */}
-      <div className="pointer-events-none mx-auto mt-8 sm:mt-10 flex max-w-[1400px] flex-col gap-4 sm:gap-5 border-t border-ink/12 pt-5 sm:pt-6 md:flex-row md:items-center md:justify-between">
-        <p className="eyebrow text-ink/50">© {new Date().getFullYear()} Urvi Architects — All rights reserved</p>
+      <div className="pointer-events-none mx-auto mt-8 sm:mt-10 flex max-w-[1400px] flex-col gap-4 sm:gap-5 border-t border-ink/8 pt-5 sm:pt-6 md:flex-row md:items-center md:justify-between">
+        <p className="eyebrow text-ink/40">© {new Date().getFullYear()} Urvi Architects — All rights reserved</p>
 
         <div className="flex items-center gap-6 sm:gap-7">
           {SOCIAL.map(({ label, href, Icon }) => (
@@ -133,7 +136,7 @@ export default function Contact() {
               href={href}
               target="_blank"
               rel="noreferrer noopener"
-              className="pointer-events-auto eyebrow group inline-flex items-center gap-2 text-ink/55 transition-colors duration-700 ease-subtle hover:text-accent"
+              className="pointer-events-auto eyebrow group inline-flex items-center gap-2 text-ink/45 transition-colors duration-700 ease-subtle hover:text-accent"
             >
               <Icon className="text-[13px]" />
               {label}
@@ -143,7 +146,7 @@ export default function Contact() {
 
         <button
           onClick={(e) => go(e, '#hero')}
-          className="pointer-events-auto eyebrow text-left text-ink/50 transition-colors duration-700 ease-subtle hover:text-accent md:text-right"
+          className="pointer-events-auto eyebrow text-left text-ink/40 transition-colors duration-700 ease-subtle hover:text-accent md:text-right"
         >
           Return to the beginning ↑
         </button>

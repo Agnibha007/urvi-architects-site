@@ -12,14 +12,14 @@ export function useLenis() {
 
     const isMobile = window.innerWidth < 768
     const lenis = new Lenis({
-      duration: isMobile ? 0.4 : 0.55,
+      duration: isMobile ? 0.45 : 0.65,
       // Very soft ease-out — barely there, just enough to smooth the edges.
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -7 * t)),
       smoothWheel: !isMobile,
       syncTouch: true,
       syncTouchLerp: isMobile ? 0.18 : 0.15,
       touchInertiaMultiplier: isMobile ? 7 : 10,
-      wheelMultiplier: isMobile ? 1.3 : 1.1,
+      wheelMultiplier: isMobile ? 1.3 : 1.0,
       lerp: null,
     })
 

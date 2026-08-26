@@ -6,13 +6,11 @@ import SplitText from '@/components/SplitText'
 import { VIDEOS, IMAGES } from '@/lib/assets'
 
 /**
- * BEDROOM — the bed assembles, then the curtains open, then the light descends.
+ * PROJECT 02 — Villa case study.
  *
- * Two clips share one pin. The bed assembly runs 0 → 0.55; the pendant light
- * clip runs 0.55 → 1 and cross-fades in underneath.
- *
- * Typography is deliberately withheld until the bed is finished — the room is
- * allowed to be quiet first.
+ * Two clips share one pin: the bed assembly runs 0 → 0.55; the pendant light
+ * clip runs 0.55 → 1 and cross-fades in underneath. The editorial framing
+ * presents this as a villa project with architectural metadata.
  */
 export default function Bedroom() {
   const root = useRef(null)
@@ -22,7 +20,7 @@ export default function Bedroom() {
   const curtainR = useRef(null)
   const warm = useRef(null)
   const type = useRef(null)
-  const quote = useRef(null)
+  const meta = useRef(null)
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -44,18 +42,18 @@ export default function Bedroom() {
       tl.fromTo(bedPlate.current, { scale: 1.12, yPercent: 2 }, { scale: 1.0, yPercent: -2, ease: 'none' }, 0)
 
       // --- Warm light builds as the room finishes.
-      tl.fromTo(warm.current, { opacity: 0 }, { opacity: 0.55, ease: 'none' }, 0.15)
+      tl.fromTo(warm.current, { opacity: 0 }, { opacity: 0.5, ease: 'none' }, 0.15)
 
       // --- Handover to the pendant clip.
       tl.fromTo(bedPlate.current, { opacity: 1 }, { opacity: 0, ease: 'none', duration: 0.16 }, 0.54)
       tl.fromTo(lampPlate.current, { opacity: 0, scale: 1.14 }, { opacity: 1, scale: 1.0, ease: 'none', duration: 0.2 }, 0.52)
 
-      // --- Only now does the language arrive.
+      // --- Type arrives.
       tl.fromTo(type.current, { yPercent: 40, opacity: 0, filter: 'blur(18px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.4)
-      tl.fromTo(quote.current, { yPercent: 24, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'apple', duration: 0.26 }, 0.58)
+      tl.fromTo(meta.current, { yPercent: 24, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'apple', duration: 0.26 }, 0.58)
 
       // --- The room dims into the material chapter.
-      tl.to([type.current, quote.current], { opacity: 0, yPercent: -18, ease: 'none' }, 0.86)
+      tl.to([type.current, meta.current], { opacity: 0, yPercent: -18, ease: 'none' }, 0.86)
     }, root)
 
     return () => ctx.revert()
@@ -110,28 +108,39 @@ export default function Bedroom() {
         <div ref={curtainR} className="pointer-events-none absolute inset-y-0 right-0 z-20 w-1/2 bg-[#E4DED5] will-move" />
 
         <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
-          <span className="eyebrow text-white/60">03 — The Bedroom</span>
+          <div className="flex items-start justify-between">
+            <span className="eyebrow text-white/55">02</span>
+            <span className="eyebrow hidden text-white/40 md:block">Project 02 / Villa</span>
+          </div>
 
           <div ref={type} className="max-w-[46rem] will-move">
             <h2 className="display-lg text-white">
               <SplitText by="word" stagger={0.07} duration={1.4} start="top 90%">
-                Built for the
+                The Villa
               </SplitText>
               <br className="hidden sm:block" />
               <span className="block sm:inline italic text-accent">
                 <SplitText by="word" stagger={0.07} duration={1.4} start="top 90%">
-                  end of the day.
+                  at dawn.
                 </SplitText>
               </span>
             </h2>
           </div>
 
-          <div ref={quote} className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-10 will-move">
-            <p className="body-sm max-w-[38ch] text-white/65">
-              Linen in three weights. A single pendant, lowered until it is almost furniture.
-              Everything at the height of a person lying down.
+          <div ref={meta} className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-10 will-move">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+              <div>
+                <p className="eyebrow mb-1.5 text-white/45">Location</p>
+                <p className="body-sm text-white/65">Fiumicino, Roma</p>
+              </div>
+              <div>
+                <p className="eyebrow mb-1.5 text-white/45">Year</p>
+                <p className="body-sm text-white/65">2025</p>
+              </div>
+            </div>
+            <p className="body-sm hidden max-w-[28ch] text-white/40 md:block">
+              Linen, travertine, warm light at 2700K. Everything at the height of a person lying down.
             </p>
-            <span className="eyebrow hidden sm:block text-white/60">2700 K — 12 lux</span>
           </div>
         </div>
       </Chapter>

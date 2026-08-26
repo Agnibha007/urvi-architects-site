@@ -11,12 +11,13 @@ export default {
         dark: '#101010',
       },
       fontFamily: {
-        display: ['Canela', 'Cormorant Garamond', 'Instrument Serif', 'Times New Roman', 'serif'],
-        sans: ['Neue Montreal', 'DM Sans', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Instrument Serif', 'Cormorant Garamond', 'Canela', 'Times New Roman', 'serif'],
+        sans: ['Inter', 'DM Sans', 'Neue Montreal', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.055em',
         micro: '0.24em',
+        editorial: '-0.02em',
       },
       transitionTimingFunction: {
         apple: 'cubic-bezier(0.16, 1, 0.3, 1)',

@@ -6,13 +6,12 @@ import SplitText from '@/components/SplitText'
 import { VIDEOS, IMAGES } from '@/lib/assets'
 
 /**
- * HERO — the chair.
+ * HERO — Architecture & Interior Design Studio identity.
  *
- * The clip itself carries rotate → explode → reassemble. What this section adds
- * is the camera: the frame pushes in, the chair rises out of the top of the
- * screen at the very end of the pin, and the title splits apart around it.
- * By the time the pin releases, the chair has already left — so the living room
- * doesn't begin, it's simply what's behind.
+ * The hero establishes URVI as a premium architecture/interior/spatial design
+ * studio. Large Instrument Serif typography, strong architectural visual, minimal
+ * supporting text, and a subtle scroll indicator. Motion should feel cinematic
+ * and physical rather than flashy.
  */
 export default function Hero() {
   const root = useRef(null)
@@ -21,6 +20,7 @@ export default function Hero() {
   const sub = useRef(null)
   const scrim = useRef(null)
   const cue = useRef(null)
+  const studioLabel = useRef(null)
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -38,16 +38,17 @@ export default function Hero() {
       tl.to(title.current, { yPercent: -18, letterSpacing: '0.02em', filter: 'blur(1px)', ease: 'none' }, 0)
         .to(sub.current, { yPercent: -60, opacity: 0, ease: 'none' }, 0)
         .to(cue.current, { opacity: 0, y: 20, duration: 0.15 }, 0)
+        .to(studioLabel.current, { opacity: 0, yPercent: -30, ease: 'none' }, 0)
 
       // Slow push-in — restrained to keep 1080p sharp on high-DPI.
       tl.fromTo(
         videoWrap.current,
         { scale: 1.02, yPercent: 0 },
-        { scale: 1.18, yPercent: -4, ease: 'none' },
+        { scale: 1.14, yPercent: -3, ease: 'none' },
         0
       )
         // Lift-off: chair exits upward, text dissolves.
-        .to(videoWrap.current, { yPercent: -40, scale: 1.26, ease: 'apple' }, 0.7)
+        .to(videoWrap.current, { yPercent: -40, scale: 1.22, ease: 'apple' }, 0.7)
         .to(title.current, { yPercent: -140, opacity: 0, filter: 'blur(14px)', ease: 'apple' }, 0.72)
 
       // Transition scrim — starts earlier, longer duration for a smoother crossfade.
@@ -87,7 +88,7 @@ export default function Hero() {
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'linear-gradient(to top, rgba(21,21,21,0.45) 0%, rgba(21,21,21,0.15) 35%, rgba(21,21,21,0) 60%)',
+                'linear-gradient(to top, rgba(21,21,21,0.5) 0%, rgba(21,21,21,0.18) 35%, rgba(21,21,21,0) 60%)',
             }}
           />
         </div>
@@ -96,37 +97,35 @@ export default function Hero() {
 
         {/* Type plate */}
         <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-6 sm:py-8 md:px-12 md:py-12">
-          <div className="flex items-start justify-between">
-            <span className="eyebrow text-white/80">Est. 2009 — Practice No. 4</span>
-            <span className="eyebrow hidden text-white/80 md:block">41.9028° N&nbsp;&nbsp;12.4964° E</span>
+          {/* Studio label — top left */}
+          <div ref={studioLabel} className="will-move">
+            <span className="eyebrow text-white/60">Architecture &amp; Interiors</span>
           </div>
 
+          {/* Main title — large Instrument Serif */}
           <div ref={title} className="will-move">
             <h1 className="display-xl text-white">
               <SplitText by="char" stagger={0.032} duration={1.5} delay={0.35}>
-                We Design
+                URVI
               </SplitText>
-              <br className="hidden sm:block" />
-              <span className="block sm:inline italic text-accent">
-                <SplitText by="char" stagger={0.032} duration={1.5} delay={0.62}>
-                  Experiences.
-                </SplitText>
-              </span>
             </h1>
+            <p className="mt-3 sm:mt-4 font-sans text-[11px] sm:text-[12px] md:text-[13px] uppercase tracking-micro text-white/50">
+              <SplitText by="char" stagger={0.02} duration={1.2} delay={0.6}>
+                Architecture &amp; Interiors
+              </SplitText>
+            </p>
           </div>
 
+          {/* Bottom row — philosophy + scroll cue */}
           <div ref={sub} className="will-move">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-              <p className="eyebrow max-w-[20ch] text-white/70">
-                Urvi Architects — Luxury Interior Studio
-              </p>
-              <p className="body-sm hidden max-w-[34ch] text-white/60 md:block">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+              <p className="body-sm hidden max-w-[34ch] text-white/50 md:block">
                 We do not decorate rooms. We compose the conditions — light, mass, material and
                 silence — under which a life is worth living slowly.
               </p>
-              <div ref={cue} className="eyebrow flex items-center gap-3 text-white/65 will-move">
+              <div ref={cue} className="eyebrow flex items-center gap-3 text-white/50 will-move">
                 <span className="inline">Scroll</span>
-                <span className="block h-[1px] w-10 origin-left bg-white/50 md:w-16" />
+                <span className="block h-[1px] w-10 origin-left bg-white/40 md:w-16" />
               </div>
             </div>
           </div>

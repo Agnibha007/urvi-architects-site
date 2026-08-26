@@ -4,28 +4,21 @@ import Chapter from '@/components/Chapter'
 import ScrollVideo from '@/components/ScrollVideo'
 import { VIDEOS, IMAGES } from '@/lib/assets'
 
-const COPY = [
-  'The first room is always a question about light.',
-  'Travertine drinks the morning and gives it back warmer.',
-  'Nothing here is placed. Everything is positioned.',
-]
-
 /**
- * LIVING ROOM — the travertine table.
+ * SELECTED WORK — editorial introduction to the portfolio.
  *
- * The chapter opens still holding the hero's bone-white scrim and dissolves it
- * as the room furnishes itself. The table scales very slightly the whole way
- * through — 1.0 → 1.09 — which is below conscious perception but reads as the
- * camera continuing to approach.
+ * This section establishes the studio's design philosophy and introduces the
+ * three featured projects. The video carries the visual; the text provides
+ * editorial context. The chapter keeps its internal id ('living') for 3D
+ * camera continuity, but reads as a portfolio showcase.
  */
 export default function LivingRoom() {
   const root = useRef(null)
   const plate = useRef(null)
   const light = useRef(null)
   const heading = useRef(null)
-  const lines = useRef(null)
-  const lamp = useRef(null)
-  const sculpture = useRef(null)
+  const desc = useRef(null)
+  const label = useRef(null)
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -39,7 +32,7 @@ export default function LivingRoom() {
         },
       })
 
-      tl.fromTo(plate.current, { scale: 1.0, yPercent: 3 }, { scale: 1.09, yPercent: -3, ease: 'none' }, 0)
+      tl.fromTo(plate.current, { scale: 1.0, yPercent: 3 }, { scale: 1.08, yPercent: -2, ease: 'none' }, 0)
 
       // Lighting drifts from cool morning to warm afternoon across the chapter.
       tl.fromTo(
@@ -50,19 +43,14 @@ export default function LivingRoom() {
       )
 
       tl.fromTo(heading.current, { yPercent: 26, opacity: 0, filter: 'blur(14px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.4 }, 0.06)
-      tl.to(heading.current, { yPercent: -22, opacity: 0.15, ease: 'none' }, 0.6)
+      tl.to(heading.current, { yPercent: -18, opacity: 0.15, ease: 'none' }, 0.62)
 
-      // Paragraph arrives line by line, never as a block.
-      tl.fromTo(
-        lines.current.children,
-        { yPercent: 120, opacity: 0 },
-        { yPercent: 0, opacity: 1, ease: 'apple', duration: 0.28, stagger: 0.14 },
-        0.22
-      )
+      // Description arrives subtly.
+      tl.fromTo(desc.current, { yPercent: 40, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.18)
+      tl.to(desc.current, { opacity: 0, ease: 'none' }, 0.6)
 
-      // Side objects parallax at different rates — depth without a 3D cost.
-      tl.fromTo(lamp.current, { yPercent: 18, opacity: 0 }, { yPercent: -26, opacity: 1, ease: 'none' }, 0.1)
-      tl.fromTo(sculpture.current, { yPercent: 32, opacity: 0 }, { yPercent: -12, opacity: 1, ease: 'none' }, 0.24)
+      // Label fades in early.
+      tl.fromTo(label.current, { opacity: 0 }, { opacity: 1, ease: 'power1.out', duration: 0.2 }, 0.04)
     }, root)
 
     return () => ctx.revert()
@@ -91,45 +79,30 @@ export default function LivingRoom() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'linear-gradient(to top, rgba(21,21,21,0.5) 0%, rgba(21,21,21,0.2) 40%, rgba(21,21,21,0) 65%), radial-gradient(130% 100% at 50% 50%, rgba(21,21,21,0) 20%, rgba(21,21,21,0.2) 100%)',
+              'linear-gradient(to top, rgba(21,21,21,0.55) 0%, rgba(21,21,21,0.2) 40%, rgba(21,21,21,0) 65%), radial-gradient(130% 100% at 50% 50%, rgba(21,21,21,0) 20%, rgba(21,21,21,0.2) 100%)',
           }}
         />
 
-        {/* Discrete objects — each stands alone, never composited together. */}
-        <img
-          ref={lamp}
-          src={IMAGES.floorLamp}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="pointer-events-none absolute left-[3%] top-[12%] hidden w-[13vw] max-w-[190px] object-contain mix-blend-multiply will-move lg:block"
-        />
-        <img
-          ref={sculpture}
-          src={IMAGES.sculpture}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="pointer-events-none absolute bottom-[8%] right-[4%] hidden w-[11vw] max-w-[160px] object-contain mix-blend-multiply will-move lg:block"
-        />
-
         <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
-          <span className="eyebrow text-white/70">01 — The Living Room</span>
+          <div ref={label} className="flex items-start justify-between will-move">
+            <span className="eyebrow text-white/60">Selected Work</span>
+            <span className="eyebrow hidden text-white/40 md:block">Three Featured Projects</span>
+          </div>
 
           <div className="max-w-[52rem]">
             <h2 ref={heading} className="display-lg text-white will-move">
-              A room that
+              Architecture
               <br />
-              <span className="italic text-accent">holds the hour.</span>
+              <span className="italic text-accent">in practice.</span>
             </h2>
           </div>
 
-          <div ref={lines} className="max-w-[36rem]">
-            {COPY.map((line) => (
-              <span key={line} className="line-mask">
-                <span className="body-sm block text-white/70 will-move">{line}</span>
-              </span>
-            ))}
+          <div ref={desc} className="max-w-[36rem] will-move">
+            <p className="body-sm text-white/60">
+              A curated selection of spaces where architecture, interior design and
+              material craft converge. Each project is a conversation between light,
+              mass and the lives lived within.
+            </p>
           </div>
         </div>
       </Chapter>

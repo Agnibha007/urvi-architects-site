@@ -32,24 +32,26 @@ function CameraRig({ reducedRef }) {
 
   useFrame((_, dt) => {
     const shot = SHOTS[scrollStore.section] ?? SHOTS.hero
-    const amp = reducedRef.current ? 0.25 : 1
+    const amp = reducedRef.current ? 0.2 : 1
 
-    // Chapter dolly + a small continuous push driven by progress within it.
+    // Chapter dolly + a very subtle continuous push driven by progress within it.
+    // Pointer parallax is restrained — just enough to feel alive, not distracting.
     target.current.set(
-      shot.pos[0] + pointer.x * 0.32 * amp,
-      shot.pos[1] - pointer.y * 0.22 * amp,
-      shot.pos[2] - scrollStore.local * 0.55 * amp
+      shot.pos[0] + pointer.x * 0.22 * amp,
+      shot.pos[1] - pointer.y * 0.16 * amp,
+      shot.pos[2] - scrollStore.local * 0.45 * amp
     )
 
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, target.current.x, 1.6, dt)
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, target.current.y, 1.6, dt)
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, target.current.z, 1.6, dt)
+    // Slower damping for more deliberate, expensive-feeling camera moves.
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, target.current.x, 1.2, dt)
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, target.current.y, 1.2, dt)
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, target.current.z, 1.2, dt)
 
     _lookTarget.current.set(...shot.look)
-    look.current.lerp(_lookTarget.current, 1 - Math.exp(-1.8 * dt))
+    look.current.lerp(_lookTarget.current, 1 - Math.exp(-1.4 * dt))
     camera.lookAt(look.current)
 
-    const fov = THREE.MathUtils.damp(camera.fov, shot.fov, 1.6, dt)
+    const fov = THREE.MathUtils.damp(camera.fov, shot.fov, 1.2, dt)
     if (Math.abs(fov - camera.fov) > 0.001) {
       camera.fov = fov
       camera.updateProjectionMatrix()
@@ -80,12 +82,12 @@ function Gate({ chapters, children, restScale = 0.0001 }) {
   return <group ref={g}>{children}</group>
 }
 
-/** Cheap volumetric shafts — two very large, very soft planes. */
+/** Cheap volumetric shafts — two very large, very soft planes. Restrained pointer interaction. */
 function LightShafts() {
   const g = useRef()
   useFrame((_, dt) => {
-    g.current.rotation.z = THREE.MathUtils.damp(g.current.rotation.z, 0.28 + pointer.x * 0.04, 0.9, dt)
-    g.current.material.opacity = THREE.MathUtils.damp(g.current.material.opacity, 0.05 + scrollStore.darkness * 0.10, 1.5, dt)
+    g.current.rotation.z = THREE.MathUtils.damp(g.current.rotation.z, 0.28 + pointer.x * 0.025, 0.9, dt)
+    g.current.material.opacity = THREE.MathUtils.damp(g.current.material.opacity, 0.04 + scrollStore.darkness * 0.08, 1.5, dt)
   })
   return (
     <mesh ref={g} position={[-2.6, 1.4, -4]} rotation={[0, 0, 0.28]}>

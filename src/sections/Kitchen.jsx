@@ -4,28 +4,20 @@ import Chapter from '@/components/Chapter'
 import ScrollVideo from '@/components/ScrollVideo'
 import { VIDEOS, IMAGES } from '@/lib/assets'
 
-const SPECS = [
-  ['Slab', 'Calacatta Viola, bookmatched'],
-  ['Span', '3.6 m, single piece'],
-  ['Edge', '20 mm mitred, hand-eased'],
-  ['Fittings', 'Unlacquered brass'],
-]
-
 /**
- * KITCHEN — the island.
+ * PROJECT 01 — Editorial architecture case study.
  *
- * The island is lifted off the page: a soft contact shadow underneath, a
- * perspective tilt that eases toward flat as you scroll, and a scale that
- * exceeds the frame. It should read as an object photographed on a plinth,
- * floating over the type rather than sitting behind it.
+ * The kitchen becomes a penthouse project. Each project includes: name, type,
+ * location, year, short architectural description, large visual, and minimal
+ * metadata. The presentation is asymmetric with generous whitespace.
  */
 export default function Kitchen() {
   const root = useRef(null)
   const plate = useRef(null)
   const shadow = useRef(null)
   const heading = useRef(null)
-  const specs = useRef(null)
-  const faucet = useRef(null)
+  const meta = useRef(null)
+  const label = useRef(null)
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -42,39 +34,33 @@ export default function Kitchen() {
       // Camera zoom + the tilt settling.
       tl.fromTo(
         plate.current,
-        { scale: 1.02, rotateX: 9, rotateY: -7, yPercent: 5 },
-        { scale: 1.22, rotateX: 0, rotateY: 3, yPercent: -5, ease: 'none' },
+        { scale: 1.02, rotateX: 6, rotateY: -5, yPercent: 4 },
+        { scale: 1.18, rotateX: 0, rotateY: 2, yPercent: -4, ease: 'none' },
         0
       )
 
       // Contact shadow tightens as the object "settles".
       tl.fromTo(
         shadow.current,
-        { opacity: 0.1, scaleX: 1.25, filter: 'blur(60px)' },
-        { opacity: 0.26, scaleX: 0.86, filter: 'blur(34px)', ease: 'none' },
+        { opacity: 0.1, scaleX: 1.2, filter: 'blur(60px)' },
+        { opacity: 0.22, scaleX: 0.88, filter: 'blur(38px)', ease: 'none' },
         0
       )
 
-      // Heading clips in from the left.
+      // Project label fades in.
+      tl.fromTo(label.current, { opacity: 0 }, { opacity: 1, ease: 'power1.out', duration: 0.2 }, 0.04)
+
+      // Heading clips in from below — editorial reveal.
       tl.fromTo(
         heading.current,
-        { clipPath: 'inset(0% 100% 0% 0%)', xPercent: -8 },
-        { clipPath: 'inset(0% 0% 0% 0%)', xPercent: 0, ease: 'apple', duration: 0.52 },
+        { clipPath: 'inset(0% 0% 100% 0%)', yPercent: 8 },
+        { clipPath: 'inset(0% 0% 0% 0%)', yPercent: 0, ease: 'apple', duration: 0.48 },
         0.04
       )
-      tl.to(heading.current, { xPercent: 10, opacity: 0.12, ease: 'none' }, 0.66)
+      tl.to(heading.current, { yPercent: -8, opacity: 0.12, ease: 'none' }, 0.62)
 
-      // Specs clip in individually.
-      Array.from(specs.current.children).forEach((child, i) => {
-        tl.fromTo(
-          child,
-          { clipPath: 'inset(0% 100% 0% 0%)', xPercent: 6 },
-          { clipPath: 'inset(0% 0% 0% 0%)', xPercent: 0, ease: 'apple', duration: 0.3, delay: i * 0.06 },
-          0.3
-        )
-      })
-
-      tl.fromTo(faucet.current, { yPercent: 24, opacity: 0 }, { yPercent: -18, opacity: 1, ease: 'none' }, 0.16)
+      // Metadata grid arrives gently.
+      tl.fromTo(meta.current, { yPercent: 30, opacity: 0, filter: 'blur(6px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.28)
     }, root)
 
     return () => ctx.revert()
@@ -113,34 +99,45 @@ export default function Kitchen() {
           }}
         />
 
-        <img
-          ref={faucet}
-          src={IMAGES.brassFaucet}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="pointer-events-none absolute right-[5%] top-[16%] hidden w-[10vw] max-w-[150px] object-contain mix-blend-multiply will-move lg:block"
-        />
-
         <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-8 sm:py-10 md:px-12 md:py-16">
-          <div className="flex items-start justify-between">
-            <span className="eyebrow text-white/70">02 — The Kitchen</span>
-            <span className="eyebrow hidden text-white/60 md:block">Object 02 / Marble Island</span>
+          <div ref={label} className="flex items-start justify-between will-move">
+            <span className="eyebrow text-white/60">01</span>
+            <span className="eyebrow hidden text-white/40 md:block">Project 01 / Residential</span>
           </div>
 
-          <h2 ref={heading} className="display-lg max-w-[16ch] text-white will-move">
-            Stone,
-            <br />
-            <span className="italic text-accent">weightless.</span>
-          </h2>
+          <div className="max-w-[18ch]">
+            <h2 ref={heading} className="display-lg text-white will-move">
+              The
+              <br />
+              Penthouse.
+            </h2>
+          </div>
 
-          <div ref={specs} className="grid max-w-3xl grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 sm:gap-y-4">
-            {SPECS.map(([k, v]) => (
-              <div key={k} className="will-move border-t border-white/30 pt-2 sm:pt-3">
-                <p className="eyebrow mb-1 sm:mb-1.5 text-white/65">{k}</p>
-                <p className="body-sm text-white/80">{v}</p>
+          {/* Project metadata — editorial style */}
+          <div ref={meta} className="will-move">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:gap-y-4">
+                <div>
+                  <p className="eyebrow mb-1.5 text-white/50">Location</p>
+                  <p className="body-sm text-white/75">Roma, Italia</p>
+                </div>
+                <div>
+                  <p className="eyebrow mb-1.5 text-white/50">Year</p>
+                  <p className="body-sm text-white/75">2024</p>
+                </div>
+                <div>
+                  <p className="eyebrow mb-1.5 text-white/50">Type</p>
+                  <p className="body-sm text-white/75">Penthouse</p>
+                </div>
+                <div>
+                  <p className="eyebrow mb-1.5 text-white/50">Area</p>
+                  <p className="body-sm text-white/75">280 m²</p>
+                </div>
               </div>
-            ))}
+              <p className="body-sm hidden max-w-[30ch] text-white/45 md:block">
+                Calacatta Viola marble island, unlacquered brass fittings, board-formed concrete.
+              </p>
+            </div>
           </div>
         </div>
       </Chapter>

@@ -84,7 +84,7 @@
     margin: 0;
     background: var(--bone);
     color: var(--ink);
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
     overflow-x: hidden;
     overscroll-behavior-y: none;
   }
@@ -94,12 +94,12 @@
     color: var(--bone);
   }
 
-  /* Display face — Canela / Cormorant Garamond for headings */
+  /* Display face — Instrument Serif for headings */
   .font-display,
   h1,
   h2,
   h3 {
-    font-family: 'Canela', 'Cormorant Garamond', 'Instrument Serif', 'Times New Roman', serif;
+    font-family: 'Instrument Serif', 'Cormorant Garamond', 'Canela', 'Times New Roman', serif;
     font-weight: 400;
   }
 
@@ -128,39 +128,38 @@
   }
 
   .display-xl {
-    /*
-     * Original desktop formula preserved: clamp(3.2rem, 12.5vw, 15rem)
-     * Mobile override uses sm: breakpoint so the full desktop scale is untouched.
-     * At 375px mobile: 3rem (48px). At 768px (sm): kicks in to 12.5vw = 96px.
-     * At 1440px laptop: 12.5vw = 180px (capped at 15rem = 240px). Identical to original.
-     */
-    font-size: clamp(3rem, 12.5vw, 15rem);
-    line-height: 0.86;
-    letter-spacing: -0.045em;
+    font-size: clamp(3.2rem, 12.5vw, 16rem);
+    line-height: 0.84;
+    letter-spacing: -0.048em;
   }
 
   .display-lg {
-    /*
-     * Mobile: 2rem (32px). sm (640px+): 8.5vw. md (768px+): same.
-     * At 1440px: 8.5vw = 122.4px. Identical to original desktop value.
-     */
-    font-size: clamp(2rem, 8.5vw, 9.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
+    font-size: clamp(2.2rem, 9vw, 10.5rem);
+    line-height: 0.88;
+    letter-spacing: -0.042em;
   }
 
   .display-md {
-    /*
-     * Mobile: 1.5rem (24px). sm (640px+): 5.5vw. md (768px+): same.
-     * At 1440px: 5.5vw = 79.2px. Identical to original desktop value.
-     */
-    font-size: clamp(1.5rem, 5.5vw, 5.5rem);
-    line-height: 0.96;
-    letter-spacing: -0.035em;
+    font-size: clamp(1.6rem, 6vw, 6rem);
+    line-height: 0.94;
+    letter-spacing: -0.036em;
+  }
+
+  .section-number {
+    @apply font-display text-[clamp(4rem,10vw,8rem)] leading-none tracking-tightest;
+    opacity: 0.06;
+  }
+
+  .project-meta {
+    @apply font-sans text-[10px] sm:text-[11px] uppercase tracking-micro font-light;
   }
 
   .body-sm {
     @apply font-sans text-[12px] sm:text-[12.5px] md:text-[13.5px] leading-[1.75] font-light;
+  }
+
+  .body-md {
+    @apply font-sans text-[13px] sm:text-[14px] md:text-[15px] leading-[1.8] font-light;
   }
 
   /* GPU-only reveal primitives */
@@ -178,9 +177,21 @@
   /* Scroll-scrubbed video — subtle sharpen to counteract 1080p → high-DPI upscale */
   video[aria-hidden='true'] {
     image-rendering: auto;
-    /* Unsharp mask via CSS — 0.5px radius, very light. Adds edge contrast
-       without the cost of a canvas pipeline. */
     filter: contrast(1.02) saturate(1.04);
+  }
+
+  /* Subtle editorial divider */
+  .divider {
+    @apply h-[1px] w-full max-w-md;
+    background: var(--ink);
+    opacity: 0.08;
+  }
+
+  /* Large metadata label for project sections */
+  .meta-label {
+    @apply font-sans text-[9px] sm:text-[10px] uppercase tracking-micro font-light;
+    color: var(--ink);
+    opacity: 0.4;
   }
 }
 
@@ -199,5 +210,27 @@
 @media (prefers-reduced-motion: reduce) {
   .grain::after {
     display: none;
+  }
+}
+
+/* Mobile-specific refinements for deliberate composition */
+@media (max-width: 767px) {
+  .display-xl {
+    font-size: clamp(2.8rem, 14vw, 4rem);
+  }
+
+  .display-lg {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+
+  .display-md {
+    font-size: clamp(1.4rem, 7vw, 2.5rem);
+  }
+}
+
+/* High-DPI refinements */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  video[aria-hidden='true'] {
+    filter: contrast(1.015) saturate(1.03);
   }
 }

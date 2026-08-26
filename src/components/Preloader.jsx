@@ -3,18 +3,18 @@ import { gsap } from '@/lib/gsap'
 import { VIDEOS } from '@/lib/assets'
 
 /**
- * The overture.
+ * The overture — refined editorial preloader.
  *
- * Nothing scrolls until the first clip has enough data to scrub. Rather than a
- * spinner, the count itself is the composition — it holds the reader in the
- * film's typographic world before a single frame appears, and the curtain lift
- * is the first camera move.
+ * Nothing scrolls until the first clip has enough data to scrub. The preloader
+ * establishes the typographic world of URVI: large serif counter, minimal
+ * studio label, clean progress bar. The curtain lift is the first camera move.
  */
 export default function Preloader({ onDone }) {
   const root = useRef(null)
   const counter = useRef(null)
   const bar = useRef(null)
   const word = useRef(null)
+  const studioLabel = useRef(null)
   const [n, setN] = useState(0)
   const exitedRef = useRef(false)
   const tlRef = useRef(null)
@@ -33,7 +33,6 @@ export default function Preloader({ onDone }) {
 
     const progress = () => {
       const elapsed = (performance.now() - started) / 1000
-      // Blend real buffer progress with a floor so it never stalls at 0.
       let buffered = 0
       try {
         if (v.buffered.length && v.duration) buffered = v.buffered.end(0) / v.duration
@@ -48,7 +47,6 @@ export default function Preloader({ onDone }) {
         settled = true
         setN(100)
         cancelAnimationFrame(raf)
-        // Hold the 100 for a beat — the pause is what makes it feel deliberate.
         setTimeout(exit, 520)
         return
       }
@@ -59,31 +57,24 @@ export default function Preloader({ onDone }) {
     raf = requestAnimationFrame(progress)
 
     const exit = () => {
-      // Guard: StrictMode double-mounts; only the first exit wins.
       if (exitedRef.current) return
       exitedRef.current = true
 
       const tl = gsap.timeline({
         onComplete: () => {
-          // Do NOT call root.current?.remove() — React owns the DOM.
-          // When onDone() sets ready=true in App, React unmounts this
-          // component and removes the node cleanly. Calling remove()
-          // here detaches the fiber target before React's commit phase,
-          // causing the "node is not a child" NotFoundError.
           onDone?.()
         },
       })
 
       tlRef.current = tl
 
-      tl.to([counter.current, word.current, bar.current], {
+      tl.to([counter.current, word.current, bar.current, studioLabel.current], {
         yPercent: -120,
         opacity: 0,
         duration: 1.1,
         stagger: 0.07,
         ease: 'apple',
       })
-        // Curtain lifts as a clip, not a fade — the page is revealed, not faded in.
         .to(
           root.current,
           { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.5, ease: 'apple' },
@@ -93,8 +84,6 @@ export default function Preloader({ onDone }) {
 
     return () => {
       cancelAnimationFrame(raf)
-      // Kill the GSAP timeline if still running — prevents the onComplete
-      // from firing after React has already begun unmounting.
       tlRef.current?.kill()
       v.removeAttribute('src')
       v.load()
@@ -108,6 +97,11 @@ export default function Preloader({ onDone }) {
         { yPercent: 100, opacity: 0 },
         { yPercent: 0, opacity: 1, duration: 1.4, stagger: 0.1, ease: 'apple' }
       )
+      gsap.fromTo(
+        studioLabel.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 1.2, delay: 0.3, ease: 'power1.out' }
+      )
     }, root)
     return () => ctx.revert()
   }, [])
@@ -118,9 +112,9 @@ export default function Preloader({ onDone }) {
       className="fixed inset-0 z-[100] flex flex-col justify-between bg-bone px-6 py-8 md:px-12 md:py-12"
       style={{ clipPath: 'inset(0% 0% 0% 0%)' }}
     >
-      <div className="line-mask">
-        <p ref={word} className="eyebrow text-ink/45 will-move">
-          Urvi Architects — Loading the film
+      <div ref={studioLabel} className="will-move">
+        <p className="eyebrow text-ink/35">
+          Architecture &amp; Interiors
         </p>
       </div>
 
@@ -134,14 +128,21 @@ export default function Preloader({ onDone }) {
             {String(n).padStart(3, '0')}
           </span>
         </div>
-        <span className="eyebrow mb-4 text-ink/30 md:mb-8">%</span>
+        <span className="eyebrow mb-4 text-ink/20 md:mb-8">%</span>
       </div>
 
-      <div ref={bar} className="h-[1.5px] w-full bg-ink/10 will-move">
-        <div
-          className="h-full origin-left bg-accent"
-          style={{ transform: `scaleX(${n / 100})`, transition: 'transform 600ms var(--ease-subtle)' }}
-        />
+      <div>
+        <div className="line-mask mb-3">
+          <p ref={word} className="font-display text-[14px] sm:text-[16px] md:text-[18px] tracking-editorial text-ink will-move">
+            URVI
+          </p>
+        </div>
+        <div ref={bar} className="h-[1px] w-full bg-ink/8 will-move">
+          <div
+            className="h-full origin-left bg-accent"
+            style={{ transform: `scaleX(${n / 100})`, transition: 'transform 600ms var(--ease-subtle)' }}
+          />
+        </div>
       </div>
     </div>
   )
