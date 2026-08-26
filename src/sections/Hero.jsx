@@ -28,8 +28,8 @@ export default function Hero() {
         scrollTrigger: {
           trigger: root.current,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 1.2}`,
-          scrub: 0.7,
+          end: () => `+=${window.innerHeight * 1.8}`,
+          scrub: 1.0,
           invalidateOnRefresh: true,
         },
       })
@@ -60,7 +60,7 @@ export default function Hero() {
 
   return (
     <div ref={root}>
-      <Chapter id="hero" length={1.2} darkness={0}>
+      <Chapter id="hero" length={1.8} darkness={0}>
         {/* Media plate */}
         <div ref={videoWrap} className="absolute inset-0 will-move">
           <ScrollVideo
@@ -69,7 +69,7 @@ export default function Hero() {
             trigger={root}
             eager
             start="top top"
-            end={() => `+=${window.innerHeight * 1.2}`}
+            end={() => `+=${window.innerHeight * 1.8}`}
             range={[0, 0.88]}
             className="h-full w-full"
             style={{ objectPosition: '50% 50%' }}

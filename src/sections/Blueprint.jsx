@@ -35,8 +35,8 @@ export default function Blueprint({ buildRef }) {
         scrollTrigger: {
           trigger: root.current,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 1.2}`,
-          scrub: 0.7,
+          end: () => `+=${window.innerHeight * 1.8}`,
+          scrub: 1.2,
           invalidateOnRefresh: true,
         },
       })
@@ -83,7 +83,7 @@ export default function Blueprint({ buildRef }) {
 
   return (
     <div ref={root}>
-      <Chapter id="blueprint" length={1.2} darkness={1} background="#101010" onProgress={onProgress}>
+      <Chapter id="blueprint" length={1.8} darkness={1} background="#101010" onProgress={onProgress}>
         <div ref={night} className="absolute inset-0 bg-dark opacity-0 will-move" />
 
         <div ref={plate} className="absolute inset-0 opacity-0 will-move">
@@ -92,7 +92,7 @@ export default function Blueprint({ buildRef }) {
             poster={IMAGES.blueprint}
             trigger={root}
             start="top top"
-            end={() => `+=${window.innerHeight * 1.2}`}
+            end={() => `+=${window.innerHeight * 1.8}`}
             range={[0.06, 0.9]}
             fit="contain"
             className="h-full w-full"

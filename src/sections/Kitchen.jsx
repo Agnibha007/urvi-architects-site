@@ -25,8 +25,8 @@ export default function Kitchen() {
         scrollTrigger: {
           trigger: root.current,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 2.2}`,
-          scrub: 0.7,
+          end: () => `+=${window.innerHeight * 3.0}`,
+          scrub: 1.2,
           invalidateOnRefresh: true,
         },
       })
@@ -68,7 +68,7 @@ export default function Kitchen() {
 
   return (
     <div ref={root}>
-      <Chapter id="kitchen" length={2.2} darkness={0.08} background="#F2EFEA">
+      <Chapter id="kitchen" length={3.0} darkness={0.08} background="#F2EFEA">
         {/* Floating plate — perspective lives on the parent so the child stays flat-composited */}
         <div className="absolute inset-0" style={{ perspective: '1200px' }}>
           <div ref={plate} className="absolute inset-0 will-move" style={{ transformStyle: 'preserve-3d' }}>
@@ -77,7 +77,7 @@ export default function Kitchen() {
               poster={IMAGES.kitchenIsland}
               trigger={root}
               start="top top"
-              end={() => `+=${window.innerHeight * 2.2}`}
+              end={() => `+=${window.innerHeight * 3.0}`}
               range={[0.02, 0.94]}
               className="h-full w-full"
             />

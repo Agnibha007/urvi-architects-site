@@ -40,8 +40,8 @@ export default function Materials({ cubeColorRef }) {
         scrollTrigger: {
           trigger: root.current,
           start: 'top top',
-          end: () => `+=${window.innerHeight * 1.4}`,
-          scrub: 0.7,
+          end: () => `+=${window.innerHeight * 2.0}`,
+          scrub: 1.2,
           invalidateOnRefresh: true,
         },
       })
@@ -65,7 +65,7 @@ export default function Materials({ cubeColorRef }) {
 
   return (
     <div ref={root}>
-      <Chapter id="materials" length={1.4} darkness={0} background="#F7F5F2" onProgress={onProgress}>
+      <Chapter id="materials" length={2.0} darkness={0} background="#F7F5F2" onProgress={onProgress}>
         <div ref={wash} className="pointer-events-none absolute inset-0 bg-white opacity-0 will-move" />
 
         <div className="relative z-30 grid h-full grid-cols-1 gap-6 sm:gap-8 px-5 sm:px-6 py-8 sm:py-10 md:grid-cols-2 md:px-12 md:py-16">
