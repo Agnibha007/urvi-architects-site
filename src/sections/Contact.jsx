@@ -144,12 +144,9 @@ export default function Contact() {
           ))}
         </div>
 
-        <button
-          onClick={(e) => go(e, '#hero')}
-          className="pointer-events-auto eyebrow text-left text-ink/40 transition-colors duration-700 ease-subtle hover:text-accent md:text-right"
-        >
-          Return to the beginning ↑
-        </button>
+        <p className="eyebrow text-ink/30 md:text-right">
+          Powered by <span className="text-ink/50">Solaeraab</span>
+        </p>
       </div>
     </footer>
   )
