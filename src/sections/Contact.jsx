@@ -69,31 +69,28 @@ export default function Contact() {
           <div className="md:col-span-5">
             <p className="eyebrow mb-4 sm:mb-6 text-ink/40">Enquiries</p>
             <a
-              href="mailto:studio@urviarchitects.com"
+              href="tel:+919676322143"
               className="pointer-events-auto group inline-flex items-start gap-2 text-ink break-all sm:break-normal"
               style={{ fontSize: 'clamp(1.4rem, 2.8vw, 3rem)', lineHeight: 1.1, letterSpacing: '-0.03em' }}
             >
               <SplitText by="char" stagger={0.018} duration={1.1}>
-                studio@urviarchitects.com
+                +91 96763 22143
               </SplitText>
               <FiArrowUpRight className="mt-2 shrink-0 text-accent transition-transform duration-1000 ease-subtle group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
           </div>
 
-          {/* Studio */}
+          {/* Founder & Studio */}
           <Reveal variant="lines" className="md:col-span-3 md:col-start-7" stagger={0.1}>
-            <p className="eyebrow mb-4 sm:mb-6 text-ink/40">Studio</p>
-            <p className="body-sm text-ink/60">
-              Via dei Coronari 148
-              <br />
-              00186 Roma RM
-              <br />
-              Italia
+            <p className="eyebrow mb-4 sm:mb-6 text-ink/40">Founder</p>
+            <p className="body-sm text-ink/70 font-medium">
+              Ismail Ahmed
             </p>
-            <p className="body-sm mt-4 sm:mt-5 text-ink/60">
-              <a href="tel:+390612345678" className="pointer-events-auto transition-colors duration-700 ease-subtle hover:text-accent">
-                +39 06 1234 5678
-              </a>
+            <p className="eyebrow mt-4 sm:mt-6 mb-4 sm:mb-6 text-ink/40">Studio</p>
+            <p className="body-sm text-ink/60">
+              Andhra Pradesh &amp; Telangana
+              <br />
+              India
             </p>
           </Reveal>
 

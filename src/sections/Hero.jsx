@@ -99,7 +99,7 @@ export default function Hero() {
         <div className="pointer-events-none relative z-30 flex h-full flex-col justify-between px-5 sm:px-6 py-6 sm:py-8 md:px-12 md:py-12">
           {/* Studio label — top left */}
           <div ref={studioLabel} className="will-move">
-            <span className="eyebrow text-white/60">Architecture &amp; Interiors</span>
+            <span className="eyebrow text-white/60">Andhra Pradesh &amp; Telangana — India</span>
           </div>
 
           {/* Main title — large Instrument Serif */}

@@ -114,7 +114,7 @@ export default function Preloader({ onDone }) {
     >
       <div ref={studioLabel} className="will-move">
         <p className="eyebrow text-ink/35">
-          Architecture &amp; Interiors
+          Andhra Pradesh &amp; Telangana — India
         </p>
       </div>
 
