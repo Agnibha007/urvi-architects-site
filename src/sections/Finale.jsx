@@ -62,9 +62,7 @@ export default function Finale() {
           <ScrollVideo
             src={VIDEOS.villaAssembly}
             poster={IMAGES.villaModel}
-            trigger={root}
-            start="top top"
-            end={() => `+=${window.innerHeight * 1.9}`}
+            sectionId="finale"
             range={[0.02, 0.94]}
             className="h-full w-full"
           />

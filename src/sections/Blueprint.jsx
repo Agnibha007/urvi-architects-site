@@ -90,9 +90,7 @@ export default function Blueprint({ buildRef }) {
           <ScrollVideo
             src={VIDEOS.blueprintVilla}
             poster={IMAGES.blueprint}
-            trigger={root}
-            start="top top"
-            end={() => `+=${window.innerHeight * 1.8}`}
+            sectionId="blueprint"
             range={[0.06, 0.9]}
             fit="contain"
             className="h-full w-full"

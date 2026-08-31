@@ -3,19 +3,22 @@ import { useScrollVideo } from '@/hooks/useScrollVideo'
 import { VIDEO_FPS } from '@/lib/assets'
 
 /**
- * A <video> that plays only when scrolled. Never autoplays, never has audio,
- * never lays out — it is a fixed GPU layer inside its pinned parent.
+ * A <video> that renders the canonical master-timeline state for its section.
+ *
+ * Elements mount with `preload="none"`; the master timeline pulls in the src
+ * (via load) as soon as the video becomes the predicted next section, and
+ * warms the decoder before it becomes active. Nothing here ever drives scroll.
+ *
+ * The `sectionId` tells the master timeline which section owns this video so
+ * its desired frame is computed from that section's canonical progress.
  */
 const ScrollVideo = forwardRef(function ScrollVideo(
   {
     src,
-    trigger,
+    sectionId,
     range,
-    start,
-    end,
     eager = false,
     fps = VIDEO_FPS,
-    onProgress,
     className = '',
     style,
     poster,
@@ -23,23 +26,24 @@ const ScrollVideo = forwardRef(function ScrollVideo(
   },
   _outer
 ) {
-  const ref = useScrollVideo({ src, trigger, range, start, end, eager, fps, onProgress })
+  const ref = useScrollVideo({ src, sectionId, range, fps })
 
   return (
     <video
       ref={ref}
+      data-eager={eager ? '1' : undefined}
       poster={poster}
       muted
       playsInline
-      preload={eager ? 'auto' : 'none'}
+      preload="none"
       disablePictureInPicture
       disableRemotePlayback
       aria-hidden="true"
       className={`will-move ${className}`}
       style={{
         objectFit: fit,
-        // Promote to its own compositor layer; decoded frames are then blitted,
-        // never repainted with the rest of the page.
+        // Promote to its own compositor layer; decoded frames are then
+        // blitted, never repainted with the rest of the page.
         transform: 'translateZ(0)',
         ...style,
       }}

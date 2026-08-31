@@ -1,182 +1,255 @@
 import { useEffect, useRef } from 'react'
-import { gsap, ScrollTrigger } from '@/lib/gsap'
+import { registerVideo, unregisterVideo } from '@/lib/masterTimeline'
 
 /**
- * Scroll-scrubbed video.
+ * Scroll-scrubbed video — a PURE RENDERER of the canonical master timeline.
  *
- * Three problems this solves, which naive `video.currentTime = progress * duration`
- * inside onUpdate does not:
+ * This hook does NOT own the page timeline. It never creates a ScrollTrigger
+ * and never blocks or advances scroll. It registers with the master timeline,
+ * which feeds it `desiredLocal` (0..1 section progress derived purely from the
+ * page's scroll position). The page keeps moving regardless of whether this
+ * video has caught up.
  *
- *  1. SEEK STORMS. Setting currentTime faster than the decoder can serve frames
- *     queues seeks and the element stalls. We keep a target value and commit it
- *     at most once per frame, and only when the previous seek has resolved.
- *  2. SUB-FRAME THRASH. Requests are quantised to the source frame grid (24fps),
- *     so micro-scrolls don't trigger decodes that produce an identical picture.
- *  3. COLD START. The element is not given a src until it approaches the viewport,
- *     then it is primed to frame 0 and held there — so the first scroll pixel
- *     already has a decoded frame to show.
+ * Two concerns are kept strictly separate:
+ *   desiredFrame   — what the page wants (updates every scroll tick)
+ *   displayedFrame — what the decoder has actually shown
+ *   readiness      — how far decoding has progressed (idle → ready)
+ *
+ * SEEK = newest-frame-wins. Only the latest desired frame is ever told to the
+ * decoder. If a seek is in flight, the newest target is stashed as `pending`
+ * and applied the instant the current seek resolves — intermediate frames are
+ * never replayed. Generation tokens discard stale decoder callbacks so a late
+ * `seeked`/RVFC from an old frame can never corrupt the current section.
  */
-export function useScrollVideo({
-  src,
-  fps = 24,
-  // Portion of the pinned scroll distance the clip is scrubbed across.
-  range = [0, 1],
-  trigger,
-  start = 'top top',
-  end = 'bottom bottom',
-  scrub = true,
-  eager = false,
-  onProgress,
-} = {}) {
-  const videoRef = useRef(null)
-  const state = useRef({ target: 0, applied: -1, seeking: false, ready: false })
 
-  // start/end are frequently passed as inline arrow functions. Holding them in a
-  // ref keeps them out of the dependency array — otherwise every parent render
-  // would tear down the ScrollTrigger AND drop the video source, forcing a refetch.
-  const cfg = useRef({ start, end, range, trigger, onProgress })
-  cfg.current = { start, end, range, trigger, onProgress }
+export function useScrollVideo({ src, fps = 24, sectionId, range = [0, 1] }) {
+  const videoRef = useRef(null)
+  const stateRef = useRef({
+    desiredLocal: 0,
+    applied: -1,
+    pendingFrame: null,
+    seeking: false,
+    generation: 0,
+    issuedGen: 0,
+    primed: false,
+    priority: 0,
+    warmed: false,
+    readiness: 'idle', // idle | loading | metadata-ready | warming | ready
+    attached: false,
+  })
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-
-    const s = state.current
+    const s = stateRef.current
     const frame = 1 / fps
-
-    /* ---- lazy attach ------------------------------------------------ */
-    const attach = () => {
-      if (video.dataset.attached) return
-      video.dataset.attached = '1'
-      video.src = src
-      video.load()
-    }
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          attach()
-          io.disconnect()
-        }
-      },
-      // Start fetching early so video is decoded before it is seen.
-      // Smaller margin on mobile to avoid unnecessary downloads on slow connections.
-      { rootMargin: window.innerWidth < 768 ? '60% 0px 60% 0px' : '120% 0px 120% 0px' }
-    )
-
-    if (eager) attach()
-    else io.observe(video)
-
-    const onLoaded = () => {
-      s.ready = true
-      // Play then immediately pause to kick the decoder alive.
-      // On Safari / iOS a video that has never been play()'d ignores
-      // currentTime changes — the seek completes but no frame is painted.
-      // Muted + playsInline means play() succeeds without a user gesture.
-      video.play().then(() => { video.pause() }).catch(() => {})
-    }
-
-    video.addEventListener('loadedmetadata', onLoaded)
-
-    const onSeeked = () => {
-      s.seeking = false
-      s.seekDeadline = 0
-    }
-    video.addEventListener('seeked', onSeeked)
-
-    /* ---- commit loop: one seek per frame, max ----------------------- */
-    // Writing currentTime every tick without a gate causes the browser to
-    // cancel in-flight seeks, which can momentarily show no frame. We keep
-    // a lightweight seek-state flag and allow a new seek only after the
-    // previous one resolves — or after a short safety valve so the video
-    // can never get permanently stuck (some decoders never fire 'seeked').
-    let stRef = null
-    const commit = (tickTime) => {
-      if (!s.ready || s.seeking) {
-        // Safety valve: if a seek was requested but never resolved within
-        // 250ms, force it through so the frame is never stuck mid-decode.
-        if (s.seeking && tickTime > s.seekDeadline) {
-          s.seeking = false
-          s.seekDeadline = 0
-        } else return
-      }
-      // Skip seeking when the video's ScrollTrigger is not active —
-      // avoids wasting decoder cycles on off-screen videos.
-      if (stRef && !stRef.isActive) return
-      const duration = video.duration
-      if (!duration || Number.isNaN(duration)) return
-
-      // Quantise to the source frame grid so micro-scrolls don't trigger
-      // redundant decodes that produce an identical picture.
-      const wanted = Math.min(duration - frame, Math.max(0, Math.round(s.target * duration / frame) * frame))
-      if (Math.abs(wanted - s.applied) < frame * 0.5) return
-
-      s.applied = wanted
-      s.seeking = true
-      s.seekDeadline = tickTime + 250
-      video.currentTime = wanted
-    }
-
-    gsap.ticker.add(commit)
-
-    // requestVideoFrameCallback: where supported, fire a pending seek the
-    // moment the previous frame is presented to screen rather than waiting
-    // for the next rAF tick. Only re-arms while the clip is on screen, so an
-    // off-screen video isn't paying a per-frame callback for nothing.
-    let disposed = false
-    let rvfcArmed = false
-    const onVideoFrame = () => {
-      rvfcArmed = false
-      if (disposed) return
-      if (stRef?.isActive && s.ready) {
-        commit(performance.now())
-        if (!rvfcArmed && typeof video.requestVideoFrameCallback === 'function') {
-          rvfcArmed = true
-          video.requestVideoFrameCallback(onVideoFrame)
-        }
-      }
-    }
-    if (typeof video.requestVideoFrameCallback === 'function') {
-      rvfcArmed = true
-      video.requestVideoFrameCallback(onVideoFrame)
-    }
-
-    /* ---- scroll binding --------------------------------------------- */
-    const [rIn, rOut] = cfg.current.range
+    const [rIn, rOut] = range
     const span = Math.max(rOut - rIn, 0.0001)
 
-    stRef = ScrollTrigger.create({
-      trigger: cfg.current.trigger?.current ?? video.parentElement,
-      start: cfg.current.start,
-      end: cfg.current.end,
-      scrub,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        const p = gsap.utils.clamp(0, 1, (self.progress - rIn) / span)
-        s.target = p
-        cfg.current.onProgress?.(p, self)
-      },
+    const setReadiness = (level) => { s.readiness = level }
+
+    // Development-only instrumentation, stripped from production builds.
+    // eslint-disable-next-line no-unused-vars
+    const trace = (msg, extra = {}) => {
+      if (import.meta.env.DEV && typeof window !== 'undefined' && window.__URVI_TRACE__) {
+        console.log(`[vid:${sectionId}] ${msg}`, {
+          priority: s.priority,
+          attached: s.attached,
+          readiness: s.readiness,
+          primed: s.primed,
+          desiredFrame: s.applied,
+          gen: s.generation,
+          ...extra,
+        })
+      }
+    }
+
+    // Prime the decoder so arbitrary seeks actually present a frame. On
+    // Safari/iOS a video that has never been play()'d ignores currentTime —
+    // muted+playsInline lets play() succeed without a gesture, then we pause.
+    // Guarded so it runs once (only until 'ready'), not every scroll tick.
+    const prime = () => {
+      if (s.primed) return
+      const p = video.play()
+      if (p && typeof p.then === 'function') {
+        p.then(() => { s.primed = true; video.pause() }).catch(() => { s.primed = true })
+      } else {
+        s.primed = true
+        video.pause()
+      }
+    }
+
+    const seekTo = (t) => {
+      s.generation++
+      s.applied = t
+      s.seeking = true
+      s.issuedGen = s.generation
+      video.currentTime = t
+    }
+
+    // When a seek resolves, apply the newest pending frame immediately. The
+    // generation token discards stale callbacks (e.g. a warm-up seek from a
+    // previous section that resolves late — it must not clobber current state).
+    const finishSeek = (capturedGen, _mediaTime) => {
+      if (capturedGen !== s.generation) return // stale — drop entirely
+      s.seeking = false
+      if (s.pendingFrame !== null) {
+        const t = s.pendingFrame
+        s.pendingFrame = null
+        seekTo(t) // bumps generation again; the next seeked must match it
+      }
+    }
+
+    const onLoadedMetadata = () => {
+      setReadiness('metadata-ready')
+      // Warm: prime the decoder and seek to this video's first slice frame so
+      // a decoded frame already exists before the section becomes active.
+      prime()
+      const startT = Math.min(Math.max(0, rIn * video.duration), video.duration - frame)
+      seekTo(startT)
+      setReadiness('warming')
+      trace('metadata-ready + primed', { warmedTo: startT })
+    }
+    const onCanPlay = () => { if (s.readiness !== 'ready') setReadiness('ready') }
+    // 'seeked' corresponds to the seek that incremented issuedGen. Compare
+    // against the CURRENT generation so a late seeked from an overwritten seek
+    // or a previous section is dropped.
+    const onSeeked = (_e2) => finishSeek(s.issuedGen)
+
+    /* ---------- priority-driven lifecycle (predictive preload) ---------- */
+
+    // Attach src eagerly for above-the-fold (hero). Others attach lazily via
+    // setPriority when they become the predicted next section.
+    const attachSrc = () => {
+      if (s.attached) return
+      s.attached = true
+      video.src = src
+      video.load()
+      // Restart the render loop (it stops while unloaded to save RAF budget).
+      startTicking()
+    }
+
+    // Release the decoder's memory. Bump the generation so no stale seek /
+    // RVFC from this decoder can corrupt a future section, then pause and drop
+    // the source. `load()` re-enters the empty state and frees buffers; the
+    // element still re-arms cleanly for a later attachSrc.
+    const unload = () => {
+      if (!s.attached) return
+      s.generation++ // invalidate any in-flight/stale decoder callbacks
+      s.issuedGen = s.generation
+      s.seeking = false
+      s.pendingFrame = null
+      s.applied = -1
+      s.primed = false
+      s.readiness = 'idle'
+      s.attached = false
+      s.warmed = false
+      try { video.pause() } catch (_e) { /* noop */ }
+      try {
+        video.removeAttribute('src')
+        video.load() // release the old resource; safe to call on the empty element
+      } catch (_e) { /* noop */ }
+    }
+
+    // Called by driveMaster only when the resident priority CHANGES (the master
+    // dedupes identical transitions) — never on every scroll tick. This is the
+    // single mechanism that alters a video's loading state.
+    const setPriority = (priority, isActive, warmNow) => {
+      // (Re)prime when the section crosses the aggressive-warm drain (0.80).
+      // prime() is idempotent — it runs at most once per attach/reset — so this
+      // never yields repeated play()/pause() calls. It's a genuine retry for
+      // the fast-scroll case where the initial preload prime came too early.
+      if (warmNow) prime()
+      s.priority = priority
+      if (priority >= 2) {
+        // Predicted next / active: attach src (idempotent) + warm the decoder.
+        attachSrc()
+        prime()
+        trace('preload/warm', { priority, warmNow })
+      } else if (priority === 0) {
+        // Distant: release memory (hysteresis is enforced by the master's
+        // distance window, so this won't thrash on a tiny progress dip).
+        unload()
+        trace('unload')
+      } else {
+        trace('available', { priority })
+      }
+      // priority === 1: keep whatever we have; never load a fresh src.
+    }
+
+    video.addEventListener('loadedmetadata', onLoadedMetadata)
+    video.addEventListener('canplay', onCanPlay)
+    video.addEventListener('seeked', onSeeked)
+
+    // Eager (hero) mount: attach immediately; otherwise register idle and let
+    // the priority system pull src in as the user approaches.
+    const eager = video.dataset.eager !== undefined
+    if (eager) attachSrc()
+
+    registerVideo(sectionId, {
+      video,
+      range,
+      fps,
+      // Pass the SHARED mutable state object so masterTimeline writes
+      // desiredLocal directly into the same object the tick reads.
+      state: s,
+      setPriority,
     })
 
+    /* ---------- render tick: catch video up to canonical state ---------- */
+
+    // The loop runs only while a video is attached (priority-driven). It is
+    // started on attach and stops when the video is unloaded, saving RAF
+    // budget for distant sections.
+    let rafId = 0
+    const tick = () => {
+      if (!s.attached) return // keep sleeping until re-attached
+      if (s.readiness !== 'ready' && s.readiness !== 'warming') {
+        rafId = requestAnimationFrame(tick)
+        return
+      }
+      const duration = video.duration
+      if (!duration || Number.isNaN(duration)) { rafId = requestAnimationFrame(tick); return }
+
+      // desired frame is a pure function of section scroll progress.
+      const local = Math.min(1, Math.max(0, (s.desiredLocal - rIn) / span))
+      const wantT = Math.min(duration - frame, Math.round(local * duration / frame) * frame)
+
+      if (!s.seeking) {
+        if (Math.abs(wantT - s.applied) >= frame * 0.5) seekTo(wantT)
+      } else {
+        // seek in flight — hold the newest target for when it resolves
+        if (s.pendingFrame === null || Math.abs(wantT - s.pendingFrame) >= frame * 0.5) {
+          s.pendingFrame = wantT
+        }
+      }
+      rafId = requestAnimationFrame(tick)
+    }
+    const startTicking = () => {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(tick)
+    }
+    if (s.attached) startTicking()
+
     return () => {
-      disposed = true
-      gsap.ticker.remove(commit)
-      stRef?.kill()
-      io.disconnect()
-      video.removeEventListener('loadedmetadata', onLoaded)
+      cancelAnimationFrame(rafId)
+      unregisterVideo(sectionId, video)
+      video.removeEventListener('loadedmetadata', onLoadedMetadata)
+      video.removeEventListener('canplay', onCanPlay)
       video.removeEventListener('seeked', onSeeked)
-      video.removeAttribute('src')
-      // Must clear the guard too. React StrictMode mounts → unmounts → remounts
-      // in development; without this reset the second mount sees `attached` still
-      // set, skips attach(), and the video silently never gets a source again.
-      delete video.dataset.attached
-      s.ready = false
       s.applied = -1
+      s.pendingFrame = null
       s.seeking = false
-      video.load()
+      s.generation++
+      s.issuedGen = 0
+      s.primed = false
+      s.readiness = 'idle'
+      s.priority = 0
+      s.attached = false
+      s.warmed = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [src, fps, scrub, eager])
+  }, [src, fps, sectionId])
 
   return videoRef
 }

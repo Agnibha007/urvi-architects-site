@@ -66,10 +66,8 @@ export default function Hero() {
           <ScrollVideo
             src={VIDEOS.heroChair}
             poster={IMAGES.loungeChair}
-            trigger={root}
+            sectionId="hero"
             eager
-            start="top top"
-            end={() => `+=${window.innerHeight * 1.8}`}
             range={[0, 0.88]}
             className="h-full w-full"
             style={{ objectPosition: '50% 50%' }}

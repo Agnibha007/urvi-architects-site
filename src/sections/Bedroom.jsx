@@ -67,9 +67,7 @@ export default function Bedroom() {
           <ScrollVideo
             src={VIDEOS.bedroomBed}
             poster={IMAGES.kingBed}
-            trigger={root}
-            start="top top"
-            end={() => `+=${window.innerHeight * 1.8}`}
+            sectionId="bedroom"
             range={[0.02, 0.56]}
             className="h-full w-full"
           />
@@ -79,9 +77,7 @@ export default function Bedroom() {
         <div ref={lampPlate} className="absolute inset-0 opacity-0 will-move">
           <ScrollVideo
             src={VIDEOS.pendantLight}
-            trigger={root}
-            start="top top"
-            end={() => `+=${window.innerHeight * 1.8}`}
+            sectionId="bedroom"
             range={[0.5, 0.98]}
             className="h-full w-full"
           />

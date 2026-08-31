@@ -63,9 +63,7 @@ export default function LivingRoom() {
           <ScrollVideo
             src={VIDEOS.livingTable}
             poster={IMAGES.coffeeTable}
-            trigger={root}
-            start="top top"
-            end={() => `+=${window.innerHeight * 1.5}`}
+            sectionId="living"
             range={[0.04, 0.92]}
             className="h-full w-full"
           />

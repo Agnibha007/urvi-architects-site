@@ -7,9 +7,11 @@ import { useRef } from 'react'
  * creative direction. 'high' = dedicated GPU (desktop), 'medium' = integrated
  * GPU / laptop, 'low' = mobile or reduced-motion.
  *
- * Purely a heuristics table; the value is a mutable ref so consumers read
- * `.current` inside useFrame / render without causing re-renders.
+ * `qualityRef` is a module-level mutable reference so non-React modules (the
+ * master timeline) can read the tier without a component re-render. The hook
+ * just guarantees it is initialised on the client.
  */
+let _q = 'high'
 function pickQuality(win) {
   if (win.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'low'
   const na = win.navigator
@@ -21,9 +23,12 @@ function pickQuality(win) {
   return 'high'
 }
 
+export const qualityRef = { current: _q }
+
 export function useQuality() {
   const quality = useRef(
     typeof window !== 'undefined' ? pickQuality(window) : 'high'
   )
+  if (typeof window !== 'undefined') qualityRef.current = quality.current
   return quality
 }

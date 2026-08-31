@@ -75,9 +75,7 @@ export default function Kitchen() {
             <ScrollVideo
               src={VIDEOS.kitchenIsland}
               poster={IMAGES.kitchenIsland}
-              trigger={root}
-              start="top top"
-              end={() => `+=${window.innerHeight * 3.0}`}
+              sectionId="kitchen"
               range={[0.02, 0.94]}
               className="h-full w-full"
             />
