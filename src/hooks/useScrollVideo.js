@@ -116,6 +116,42 @@ export function useScrollVideo({ src, fps = 24, sectionId, range = [0, 1] }) {
     // or a previous section is dropped.
     const onSeeked = (_e2) => finishSeek(s.issuedGen)
 
+    /* ---------- render tick: catch video up to canonical state ---------- */
+
+    // The loop runs only while a video is attached (priority-driven). It is
+    // started on attach and stops when the video is unloaded, saving RAF
+    // budget for distant sections. Declared HERE (before attachSrc) because
+    // attachSrc's eager path runs synchronously during the effect body, so all
+    // referenced consts must already be initialised (no TDZ).
+    let rafId = 0
+    const tick = () => {
+      if (!s.attached) return // keep sleeping until re-attached
+      if (s.readiness !== 'ready' && s.readiness !== 'warming') {
+        rafId = requestAnimationFrame(tick)
+        return
+      }
+      const duration = video.duration
+      if (!duration || Number.isNaN(duration)) { rafId = requestAnimationFrame(tick); return }
+
+      // desired frame is a pure function of section scroll progress.
+      const local = Math.min(1, Math.max(0, (s.desiredLocal - rIn) / span))
+      const wantT = Math.min(duration - frame, Math.round(local * duration / frame) * frame)
+
+      if (!s.seeking) {
+        if (Math.abs(wantT - s.applied) >= frame * 0.5) seekTo(wantT)
+      } else {
+        // seek in flight — hold the newest target for when it resolves
+        if (s.pendingFrame === null || Math.abs(wantT - s.pendingFrame) >= frame * 0.5) {
+          s.pendingFrame = wantT
+        }
+      }
+      rafId = requestAnimationFrame(tick)
+    }
+    const startTicking = () => {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(tick)
+    }
+
     /* ---------- priority-driven lifecycle (predictive preload) ---------- */
 
     // Attach src eagerly for above-the-fold (hero). Others attach lazily via
@@ -196,39 +232,6 @@ export function useScrollVideo({ src, fps = 24, sectionId, range = [0, 1] }) {
       setPriority,
     })
 
-    /* ---------- render tick: catch video up to canonical state ---------- */
-
-    // The loop runs only while a video is attached (priority-driven). It is
-    // started on attach and stops when the video is unloaded, saving RAF
-    // budget for distant sections.
-    let rafId = 0
-    const tick = () => {
-      if (!s.attached) return // keep sleeping until re-attached
-      if (s.readiness !== 'ready' && s.readiness !== 'warming') {
-        rafId = requestAnimationFrame(tick)
-        return
-      }
-      const duration = video.duration
-      if (!duration || Number.isNaN(duration)) { rafId = requestAnimationFrame(tick); return }
-
-      // desired frame is a pure function of section scroll progress.
-      const local = Math.min(1, Math.max(0, (s.desiredLocal - rIn) / span))
-      const wantT = Math.min(duration - frame, Math.round(local * duration / frame) * frame)
-
-      if (!s.seeking) {
-        if (Math.abs(wantT - s.applied) >= frame * 0.5) seekTo(wantT)
-      } else {
-        // seek in flight — hold the newest target for when it resolves
-        if (s.pendingFrame === null || Math.abs(wantT - s.pendingFrame) >= frame * 0.5) {
-          s.pendingFrame = wantT
-        }
-      }
-      rafId = requestAnimationFrame(tick)
-    }
-    const startTicking = () => {
-      cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(tick)
-    }
     if (s.attached) startTicking()
 
     return () => {
