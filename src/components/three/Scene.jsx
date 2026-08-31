@@ -29,8 +29,11 @@ function CameraRig({ reducedRef }) {
   const look = useRef(new THREE.Vector3())
   const target = useRef(new THREE.Vector3())
   const _lookTarget = useRef(new THREE.Vector3())
+  const lastFov = useRef(camera.fov)
 
   useFrame((_, dt) => {
+    // Clamp dt to prevent large jumps after tab-switch or GC pauses.
+    const clampedDt = Math.min(dt, 0.1)
     const shot = SHOTS[scrollStore.section] ?? SHOTS.hero
     const amp = reducedRef.current ? 0.2 : 1
 
@@ -42,18 +45,21 @@ function CameraRig({ reducedRef }) {
       shot.pos[2] - scrollStore.local * 0.45 * amp
     )
 
-    // Slower damping for more deliberate, expensive-feeling camera moves.
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, target.current.x, 1.2, dt)
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, target.current.y, 1.2, dt)
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, target.current.z, 1.2, dt)
+    // Responsive damping — 3.0 = quick enough to feel connected to scroll,
+    // slow enough to feel cinematic. Previously 1.2 which was sluggish.
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, target.current.x, 3.0, clampedDt)
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, target.current.y, 3.0, clampedDt)
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, target.current.z, 3.0, clampedDt)
 
     _lookTarget.current.set(...shot.look)
-    look.current.lerp(_lookTarget.current, 1 - Math.exp(-1.4 * dt))
+    look.current.lerp(_lookTarget.current, 1 - Math.exp(-3.5 * clampedDt))
     camera.lookAt(look.current)
 
-    const fov = THREE.MathUtils.damp(camera.fov, shot.fov, 1.2, dt)
-    if (Math.abs(fov - camera.fov) > 0.001) {
+    // Only update projection matrix when FOV meaningfully changes.
+    const fov = THREE.MathUtils.damp(camera.fov, shot.fov, 3.0, clampedDt)
+    if (Math.abs(fov - lastFov.current) > 0.05) {
       camera.fov = fov
+      lastFov.current = fov
       camera.updateProjectionMatrix()
     }
   })
@@ -86,8 +92,9 @@ function Gate({ chapters, children, restScale = 0.0001 }) {
 function LightShafts() {
   const g = useRef()
   useFrame((_, dt) => {
-    g.current.rotation.z = THREE.MathUtils.damp(g.current.rotation.z, 0.28 + pointer.x * 0.025, 0.9, dt)
-    g.current.material.opacity = THREE.MathUtils.damp(g.current.material.opacity, 0.04 + scrollStore.darkness * 0.08, 1.5, dt)
+    const clampedDt = Math.min(dt, 0.1)
+    g.current.rotation.z = THREE.MathUtils.damp(g.current.rotation.z, 0.28 + pointer.x * 0.025, 0.9, clampedDt)
+    g.current.material.opacity = THREE.MathUtils.damp(g.current.material.opacity, 0.04 + scrollStore.darkness * 0.08, 1.5, clampedDt)
   })
   return (
     <mesh ref={g} position={[-2.6, 1.4, -4]} rotation={[0, 0, 0.28]}>
@@ -121,6 +128,8 @@ function useMediaFlags() {
 export default function Scene({ cubeColorRef, buildRef }) {
   const { reduced: reducedRef, mobile: mobileRef } = useMediaFlags()
 
+  const dprMax = mobileRef.current ? 1.5 : reducedRef.current ? 1.5 : 2
+
   return (
     <div
       className="pointer-events-none fixed inset-0 z-20"
@@ -128,17 +137,16 @@ export default function Scene({ cubeColorRef, buildRef }) {
       aria-hidden="true"
     >
       <Canvas
-        dpr={[1, mobileRef.current ? 1.5 : 2]}
+        dpr={[1, dprMax]}
         gl={{
           antialias: !mobileRef.current,
           alpha: true,
           powerPreference: 'high-performance',
           stencil: false,
           depth: true,
+          preserveDrawingBuffer: false,
         }}
         camera={{ position: [0, 0, 7.2], fov: 42, near: 0.1, far: 60 }}
-        // Frameloop stays 'always' — the objects breathe even when scroll is idle,
-        // but every object is GPU-animated so the CPU cost per frame is ~0.
         frameloop="always"
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping

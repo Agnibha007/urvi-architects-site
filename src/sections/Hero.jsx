@@ -49,7 +49,7 @@ export default function Hero() {
       )
         // Lift-off: chair exits upward, text dissolves.
         .to(videoWrap.current, { yPercent: -40, scale: 1.22, ease: 'apple' }, 0.7)
-        .to(title.current, { yPercent: -140, opacity: 0, filter: 'blur(14px)', ease: 'apple' }, 0.72)
+        .to(title.current, { yPercent: -140, opacity: 0, filter: 'blur(6px)', ease: 'apple' }, 0.72)
 
       // Transition scrim — starts earlier, longer duration for a smoother crossfade.
       tl.fromTo(scrim.current, { opacity: 0 }, { opacity: 1, ease: 'power1.inOut' }, 0.72)

@@ -41,7 +41,7 @@ export default function SplitText({
     if (!targets.length) return
 
     const ctx = gsap.context(() => {
-      gsap.set(targets, { yPercent: parseFloat(y), rotate, opacity: blur ? 0 : 1, ...(blur && { filter: 'blur(8px)' }) })
+      gsap.set(targets, { yPercent: parseFloat(y), rotate, opacity: blur ? 0 : 1, ...(blur && { filter: 'blur(4px)' }) })
 
       gsap.to(targets, {
         yPercent: 0,

@@ -50,7 +50,8 @@ export default function Preloader({ onDone }) {
         setTimeout(exit, 520)
         return
       }
-      raf = requestAnimationFrame(progress)
+      // Throttle to ~30fps for the loading counter — it doesn't need 120fps.
+      setTimeout(() => { raf = requestAnimationFrame(progress) }, 33)
     }
 
     v.load()

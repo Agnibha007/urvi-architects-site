@@ -40,15 +40,15 @@ export default function Finale() {
       tl.to(plate.current, { scale: 1.05, ease: 'none' }, 0.62)
 
       const statement = (el, at) => {
-        tl.fromTo(el, { yPercent: 54, opacity: 0, filter: 'blur(18px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.2 }, at)
-        tl.to(el, { yPercent: -48, opacity: 0, filter: 'blur(14px)', ease: 'apple', duration: 0.18 }, at + 0.26)
+        tl.fromTo(el, { yPercent: 54, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.2 }, at)
+        tl.to(el, { yPercent: -48, opacity: 0, filter: 'blur(6px)', ease: 'apple', duration: 0.18 }, at + 0.26)
       }
 
       statement(l1.current, 0.14)
       statement(l2.current, 0.44)
 
       // The CTA is the only thing that stays.
-      tl.fromTo(cta.current, { yPercent: 42, opacity: 0, filter: 'blur(16px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.22 }, 0.74)
+      tl.fromTo(cta.current, { yPercent: 42, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.22 }, 0.74)
       tl.fromTo(ctaLine.current, { scaleX: 0 }, { scaleX: 1, ease: 'apple', duration: 0.24 }, 0.82)
     }, root)
 

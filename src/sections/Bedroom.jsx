@@ -49,7 +49,7 @@ export default function Bedroom() {
       tl.fromTo(lampPlate.current, { opacity: 0, scale: 1.14 }, { opacity: 1, scale: 1.0, ease: 'none', duration: 0.2 }, 0.52)
 
       // --- Type arrives.
-      tl.fromTo(type.current, { yPercent: 40, opacity: 0, filter: 'blur(18px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.4)
+      tl.fromTo(type.current, { yPercent: 40, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.4)
       tl.fromTo(meta.current, { yPercent: 24, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'apple', duration: 0.26 }, 0.58)
 
       // --- The room dims into the material chapter.

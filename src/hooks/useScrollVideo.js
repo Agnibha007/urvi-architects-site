@@ -89,8 +89,12 @@ export function useScrollVideo({
     // a lightweight seek-state flag and allow a new seek only after the
     // previous one resolves — or after a timeout safety valve so the
     // video can never get permanently stuck.
+    let stRef = null
     const commit = () => {
       if (!s.ready || s.seeking) return
+      // Skip seeking when the video's ScrollTrigger is not active —
+      // avoids wasting decoder cycles on off-screen videos.
+      if (stRef && !stRef.isActive) return
       const duration = video.duration
       if (!duration || Number.isNaN(duration)) return
 
@@ -110,7 +114,7 @@ export function useScrollVideo({
     const [rIn, rOut] = cfg.current.range
     const span = Math.max(rOut - rIn, 0.0001)
 
-    const st = ScrollTrigger.create({
+    stRef = ScrollTrigger.create({
       trigger: cfg.current.trigger?.current ?? video.parentElement,
       start: cfg.current.start,
       end: cfg.current.end,
@@ -125,7 +129,7 @@ export function useScrollVideo({
 
     return () => {
       gsap.ticker.remove(commit)
-      st.kill()
+      stRef?.kill()
       io.disconnect()
       video.removeEventListener('loadedmetadata', onLoaded)
       video.removeEventListener('seeked', onSeeked)

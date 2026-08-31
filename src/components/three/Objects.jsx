@@ -8,6 +8,21 @@ import { MarbleMaterial, BrassMaterial, GlassMaterial, BlueprintMaterial } from 
 /* Shared damping helper — everything moves late, never instantly. */
 const damp = (cur, target, lambda, dt) => THREE.MathUtils.damp(cur, target, lambda, dt)
 
+/* Reusable shared geometries — created once, never disposed (lives for app lifetime). */
+const _sphereGeo = new THREE.SphereGeometry(1, 48, 48)
+const _torusGeo = new THREE.TorusGeometry(1, 0.055, 12, 64)
+const _boxGeo = new THREE.BoxGeometry(1.35, 1.35, 1.35)
+const _boxEdges = new THREE.EdgesGeometry(_boxGeo)
+
+// WireframeVilla volumes — memoized once.
+const _villaGeos = [
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(3.4, 0.95, 1.9)),
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(1.3, 2.05, 1.5)),
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(1.1, 0.7, 0.9)),
+  new THREE.EdgesGeometry(new THREE.BoxGeometry(3.8, 0.06, 2.3)),
+]
+const _columnGeo = new THREE.EdgesGeometry(new THREE.CylinderGeometry(0.045, 0.045, 0.92, 8))
+
 /* ================================================================== */
 export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
   const mesh = useRef()
@@ -15,21 +30,20 @@ export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
+    const clampedDt = Math.min(dt, 0.1)
     mat.uniforms.uTime.value = t
-    mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, dt)
+    mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, clampedDt)
 
     const m = mesh.current
     // Slow tumble + very subtle pointer parallax. Restrained for architectural feel.
-    m.rotation.y += dt * 0.06
-    m.rotation.x = damp(m.rotation.x, pointer.y * 0.07, 1.6, dt)
-    m.position.x = damp(m.position.x, position[0] + pointer.x * 0.15, 1.4, dt)
-    m.position.y = damp(m.position.y, position[1] + Math.sin(t * 0.4 + phase) * 0.12 - pointer.y * 0.1, 1.4, dt)
+    m.rotation.y += clampedDt * 0.06
+    m.rotation.x = damp(m.rotation.x, pointer.y * 0.07, 1.6, clampedDt)
+    m.position.x = damp(m.position.x, position[0] + pointer.x * 0.15, 1.4, clampedDt)
+    m.position.y = damp(m.position.y, position[1] + Math.sin(t * 0.4 + phase) * 0.12 - pointer.y * 0.1, 1.4, clampedDt)
   })
 
   return (
-    <mesh ref={mesh} position={position} scale={scale} material={mat}>
-      <sphereGeometry args={[1, 96, 96]} />
-    </mesh>
+    <mesh ref={mesh} position={position} scale={scale} material={mat} geometry={_sphereGeo} />
   )
 }
 
@@ -40,20 +54,19 @@ export function BrassRing({ position = [0, 0, 0], scale = 1, phase = 1.2 }) {
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
+    const clampedDt = Math.min(dt, 0.1)
     mat.uniforms.uTime.value = t
-    mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, dt)
+    mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, clampedDt)
 
     const m = mesh.current
-    m.rotation.z += dt * 0.09
-    m.rotation.x = damp(m.rotation.x, 0.85 + pointer.y * 0.1, 1.5, dt)
-    m.rotation.y = damp(m.rotation.y, pointer.x * 0.16, 1.5, dt)
+    m.rotation.z += clampedDt * 0.09
+    m.rotation.x = damp(m.rotation.x, 0.85 + pointer.y * 0.1, 1.5, clampedDt)
+    m.rotation.y = damp(m.rotation.y, pointer.x * 0.16, 1.5, clampedDt)
     m.position.y = position[1] + Math.sin(t * 0.36 + phase) * 0.16
   })
 
   return (
-    <mesh ref={mesh} position={position} scale={scale} material={mat}>
-      <torusGeometry args={[1, 0.055, 48, 256]} />
-    </mesh>
+    <mesh ref={mesh} position={position} scale={scale} material={mat} geometry={_torusGeo} />
   )
 }
 
@@ -66,25 +79,23 @@ export function MaterialCube({ position = [0, 0, 0], scale = 1, colorRef }) {
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
+    const clampedDt = Math.min(dt, 0.1)
     mat.uniforms.uTime.value = t
     if (colorRef?.current) target.set(colorRef.current)
-    mat.uniforms.uBase.value.lerp(target, 1 - Math.exp(-2.2 * dt))
+    mat.uniforms.uBase.value.lerp(target, 1 - Math.exp(-2.2 * clampedDt))
 
     const g = group.current
     // Driven by scroll within the materials chapter, plus a subtle mouse nudge.
-    g.rotation.y = damp(g.rotation.y, scrollStore.local * Math.PI * 2 + pointer.x * 0.18, 2.4, dt)
-    g.rotation.x = damp(g.rotation.x, -0.18 + pointer.y * 0.1, 2.0, dt)
+    g.rotation.y = damp(g.rotation.y, scrollStore.local * Math.PI * 2 + pointer.x * 0.18, 2.4, clampedDt)
+    g.rotation.x = damp(g.rotation.x, -0.18 + pointer.y * 0.1, 2.0, clampedDt)
     g.position.y = position[1] + Math.sin(t * 0.45) * 0.06
   })
 
   return (
     <group ref={group} position={position} scale={scale}>
-      <mesh material={mat}>
-        <boxGeometry args={[1.35, 1.35, 1.35, 4, 4, 4]} />
-      </mesh>
-      {/* Brass edge outline — a wireframe box very slightly larger. */}
-      <lineSegments scale={1.002}>
-        <edgesGeometry args={[new THREE.BoxGeometry(1.35, 1.35, 1.35)]} />
+      <mesh material={mat} geometry={_boxGeo} />
+      {/* Brass edge outline — pre-computed EdgesGeometry, shared across all instances. */}
+      <lineSegments geometry={_boxEdges} scale={1.002}>
         <lineBasicMaterial color="#A98D67" transparent opacity={0.5} />
       </lineSegments>
     </group>
@@ -95,22 +106,22 @@ export function MaterialCube({ position = [0, 0, 0], scale = 1, colorRef }) {
 export function GlassPlane({ position = [0, 0, 0], rotation = [0, 0, 0], size = [2, 3], phase = 0 }) {
   const mesh = useRef()
   const mat = useMemo(() => new THREE.ShaderMaterial({ ...GlassMaterial, uniforms: THREE.UniformsUtils.clone(GlassMaterial.uniforms), side: THREE.DoubleSide, depthWrite: false }), [])
+  const geo = useMemo(() => new THREE.PlaneGeometry(size[0], size[1]), [size[0], size[1]])
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
+    const clampedDt = Math.min(dt, 0.1)
     mat.uniforms.uTime.value = t
-    mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, dt)
+    mat.uniforms.uDark.value = damp(mat.uniforms.uDark.value, scrollStore.darkness, 2.5, clampedDt)
 
     const m = mesh.current
-    m.rotation.y = damp(m.rotation.y, rotation[1] + pointer.x * 0.12, 1.2, dt)
-    m.rotation.x = damp(m.rotation.x, rotation[0] + pointer.y * 0.06, 1.2, dt)
+    m.rotation.y = damp(m.rotation.y, rotation[1] + pointer.x * 0.12, 1.2, clampedDt)
+    m.rotation.x = damp(m.rotation.x, rotation[0] + pointer.y * 0.06, 1.2, clampedDt)
     m.position.y = position[1] + Math.sin(t * 0.28 + phase) * 0.12
   })
 
   return (
-    <mesh ref={mesh} position={position} rotation={rotation} material={mat}>
-      <planeGeometry args={size} />
-    </mesh>
+    <mesh ref={mesh} position={position} rotation={rotation} material={mat} geometry={geo} />
   )
 }
 
@@ -123,13 +134,13 @@ export function WireframeVilla({ position = [0, 0, 0], scale = 1, buildRef }) {
     []
   )
 
-  // Massing: a long low volume, a taller cross-wing, a colonnade, a flat roof plane.
+  // Massing volumes and columns are pre-computed shared geometries (module-level).
   const volumes = useMemo(
     () => [
-      { p: [0, 0, 0], s: [3.4, 0.95, 1.9] },
-      { p: [1.2, 0.55, -0.35], s: [1.3, 2.05, 1.5] },
-      { p: [-1.5, -0.12, 0.85], s: [1.1, 0.7, 0.9] },
-      { p: [0, 1.02, 0], s: [3.8, 0.06, 2.3] },
+      { p: [0, 0, 0], s: 0 },
+      { p: [1.2, 0.55, -0.35], s: 1 },
+      { p: [-1.5, -0.12, 0.85], s: 2 },
+      { p: [0, 1.02, 0], s: 3 },
     ],
     []
   )
@@ -138,25 +149,22 @@ export function WireframeVilla({ position = [0, 0, 0], scale = 1, buildRef }) {
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
+    const clampedDt = Math.min(dt, 0.1)
     mat.uniforms.uTime.value = t
-    if (buildRef) mat.uniforms.uBuild.value = damp(mat.uniforms.uBuild.value, buildRef.current, 4, dt)
+    if (buildRef) mat.uniforms.uBuild.value = damp(mat.uniforms.uBuild.value, buildRef.current, 4, clampedDt)
 
     const g = group.current
-    g.rotation.y = damp(g.rotation.y, -0.55 + pointer.x * 0.2 + (buildRef?.current ?? 0) * 0.7, 1.6, dt)
-    g.rotation.x = damp(g.rotation.x, 0.16 + pointer.y * 0.06, 1.6, dt)
+    g.rotation.y = damp(g.rotation.y, -0.55 + pointer.x * 0.2 + (buildRef?.current ?? 0) * 0.7, 1.6, clampedDt)
+    g.rotation.x = damp(g.rotation.x, 0.16 + pointer.y * 0.06, 1.6, clampedDt)
   })
 
   return (
     <group ref={group} position={position} scale={scale}>
       {volumes.map((v, i) => (
-        <lineSegments key={i} position={v.p} material={mat}>
-          <edgesGeometry args={[new THREE.BoxGeometry(...v.s)]} />
-        </lineSegments>
+        <lineSegments key={i} position={v.p} material={mat} geometry={_villaGeos[i]} />
       ))}
       {columns.map((p, i) => (
-        <lineSegments key={`c${i}`} position={p} material={mat}>
-          <edgesGeometry args={[new THREE.CylinderGeometry(0.045, 0.045, 0.92, 8)]} />
-        </lineSegments>
+        <lineSegments key={`c${i}`} position={p} material={mat} geometry={_columnGeo} />
       ))}
       {/* Site grid */}
       <gridHelper args={[9, 18, '#3E6B7A', '#22404A']} position={[0, -0.5, 0]} />
@@ -235,10 +243,11 @@ export function LightParticles({ count = 420 }) {
   }, [count])
 
   useFrame((_, dt) => {
+    const clampedDt = Math.min(dt, 0.1)
     material.uniforms.uTime.value = performance.now() / 1000
-    material.uniforms.uDark.value = damp(material.uniforms.uDark.value, scrollStore.darkness, 2, dt)
+    material.uniforms.uDark.value = damp(material.uniforms.uDark.value, scrollStore.darkness, 2, clampedDt)
     material.uniforms.uPointer.value.set(pointer.x, pointer.y)
-    points.current.rotation.y += dt * 0.005
+    points.current.rotation.y += clampedDt * 0.005
   })
 
   return <points ref={points} geometry={geometry} material={material} />

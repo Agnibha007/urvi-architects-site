@@ -204,7 +204,7 @@
   z-index: 60;
   opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
-  will-change: transform;
+  /* No will-change — this is a static composited layer that never changes. */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -232,5 +232,19 @@
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   video[aria-hidden='true'] {
     filter: contrast(1.015) saturate(1.03);
+  }
+}
+
+/* Mobile: reduce expensive blur filters — blur is GPU-heavy on low-end tiles */
+@media (max-width: 767px) {
+  .will-move {
+    will-change: transform, opacity;
+  }
+}
+
+/* Reduced motion: strip all will-change for zero-cost paint */
+@media (prefers-reduced-motion: reduce) {
+  .will-move {
+    will-change: auto;
   }
 }

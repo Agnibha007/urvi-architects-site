@@ -42,11 +42,11 @@ export default function LivingRoom() {
         0
       )
 
-      tl.fromTo(heading.current, { yPercent: 26, opacity: 0, filter: 'blur(14px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.4 }, 0.06)
+      tl.fromTo(heading.current, { yPercent: 26, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.4 }, 0.06)
       tl.to(heading.current, { yPercent: -18, opacity: 0.15, ease: 'none' }, 0.62)
 
       // Description arrives subtly.
-      tl.fromTo(desc.current, { yPercent: 40, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.18)
+      tl.fromTo(desc.current, { yPercent: 40, opacity: 0, filter: 'blur(4px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', ease: 'apple', duration: 0.3 }, 0.18)
       tl.to(desc.current, { opacity: 0, ease: 'none' }, 0.6)
 
       // Label fades in early.

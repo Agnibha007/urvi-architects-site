@@ -32,7 +32,7 @@ export default function Contact() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         mark.current,
-        { yPercent: 26, opacity: 0, filter: 'blur(16px)' },
+        { yPercent: 26, opacity: 0, filter: 'blur(8px)' },
         {
           yPercent: 0,
           opacity: 1,

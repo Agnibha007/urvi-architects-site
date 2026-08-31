@@ -34,9 +34,9 @@ export default function Reveal({
       const targets = variant === 'lines' ? el.children : el
 
       const base = {
-        rise: { y: distance, opacity: 0, filter: 'blur(10px)' },
-        lines: { y: distance * 0.6, opacity: 0, filter: 'blur(6px)' },
-        scale: { scale: 0.92, opacity: 0, filter: 'blur(12px)' },
+        rise: { y: distance, opacity: 0, filter: 'blur(6px)' },
+        lines: { y: distance * 0.6, opacity: 0, filter: 'blur(4px)' },
+        scale: { scale: 0.92, opacity: 0, filter: 'blur(6px)' },
         clip: {
           clipPath:
             from === 'left'

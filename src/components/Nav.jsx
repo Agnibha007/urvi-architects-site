@@ -27,13 +27,20 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
+    // Track which frame we last processed to skip redundant updates.
+    let lastFrame = -1
     const tick = () => {
+      // Skip if nothing changed since last frame.
+      const frame = scrollStore.global
+      if (frame === lastFrame && scrollStore.section === lastSection.current) return
+      lastFrame = frame
+
       // Recolour
       const d = scrollStore.darkness
       root.current?.style.setProperty('--chrome', d > 0.55 ? '#F0F4F5' : '#151515')
       root.current?.style.setProperty('--chrome-dim', d > 0.55 ? 'rgba(240,244,245,0.4)' : 'rgba(21,21,21,0.4)')
 
-      // Progress hairline
+      // Progress hairline — use transform for GPU compositing
       if (bar.current) bar.current.style.transform = `scaleX(${scrollStore.global})`
 
       // Only re-render when the chapter actually changes.

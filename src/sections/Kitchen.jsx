@@ -42,8 +42,8 @@ export default function Kitchen() {
       // Contact shadow tightens as the object "settles".
       tl.fromTo(
         shadow.current,
-        { opacity: 0.1, scaleX: 1.2, filter: 'blur(60px)' },
-        { opacity: 0.22, scaleX: 0.88, filter: 'blur(38px)', ease: 'none' },
+        { opacity: 0.1, scaleX: 1.2 },
+        { opacity: 0.22, scaleX: 0.88, ease: 'none' },
         0
       )
 
