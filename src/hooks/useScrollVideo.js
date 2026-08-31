@@ -36,6 +36,16 @@ export function useScrollVideo({ src, fps = 24, sectionId, range = [0, 1] }) {
     warmed: false,
     readiness: 'idle', // idle | loading | metadata-ready | warming | ready
     attached: false,
+    // Dev-only diagnostics object; the whole object is compiled away in prod.
+    ...(import.meta.env.DEV
+      ? {
+          dev: {
+            seeks: 0,
+            seekLatencyMs: [], // last-seek latency ring (time from currentTime to seeked)
+            lastSeekIssuedAt: 0,
+          },
+        }
+      : {}),
   })
 
   useEffect(() => {
@@ -47,6 +57,29 @@ export function useScrollVideo({ src, fps = 24, sectionId, range = [0, 1] }) {
     const span = Math.max(rOut - rIn, 0.0001)
 
     const setReadiness = (level) => { s.readiness = level }
+
+    // Dev-only: summarize the media buffer/seekable ranges + duration so we can
+    // tell whether a seek's target should already be local vs requires network.
+    const describeBuffered = (el) => {
+      if (!import.meta.env.DEV) return ''
+      const out = []
+      try {
+        for (let i = 0; i < el.buffered.length; i++) {
+          out.push(`${el.buffered.start(i).toFixed(2)}-${el.buffered.end(i).toFixed(2)}`)
+        }
+      } catch (_e) { /* noop */ }
+      return `buffered[${out.join(',') || 'none'}] dur=${(el.duration || 0).toFixed(2)} seekable${el.seekable.length}` 
+    }
+
+    // Dev-only helper to make the target's buffer locality explicit on a miss.
+    const isSeekInsideBuffer = (el, t) => {
+      try {
+        for (let i = 0; i < el.buffered.length; i++) {
+          if (t >= el.buffered.start(i) && t <= el.buffered.end(i)) return true
+        }
+      } catch (_e) { /* noop */ }
+      return false
+    }
 
     // Development-only instrumentation, stripped from production builds.
     // eslint-disable-next-line no-unused-vars
@@ -84,14 +117,35 @@ export function useScrollVideo({ src, fps = 24, sectionId, range = [0, 1] }) {
       s.applied = t
       s.seeking = true
       s.issuedGen = s.generation
+      if (import.meta.env.DEV) {
+        // Dev-only: stamp the seek start so seeked latency can be measured.
+        s.dev.lastSeekIssuedAt = window.performance?.now?.() ?? 0
+        s.dev.seeks++
+        trace('seek', { to: t, seeks: s.dev.seeks, cur: video.currentTime })
+      }
       video.currentTime = t
     }
 
     // When a seek resolves, apply the newest pending frame immediately. The
     // generation token discards stale callbacks (e.g. a warm-up seek from a
     // previous section that resolves late — it must not clobber current state).
-    const finishSeek = (capturedGen, _mediaTime) => {
+    const finishSeek = (capturedGen, mediaTime) => {
       if (capturedGen !== s.generation) return // stale — drop entirely
+      if (import.meta.env.DEV) {
+        // Dev-only latency bookkeeping.
+        const ms = (window.performance?.now?.() ?? 0) - s.dev.lastSeekIssuedAt
+        s.dev.seekLatencyMs.push(ms)
+        if (s.dev.seekLatencyMs.length > 32) s.dev.seekLatencyMs.shift()
+        trace('seeked', {
+          to: mediaTime,
+          latencyMs: ms,
+          seeks: s.dev.seeks,
+          seekedAt: video.currentTime,
+          buffered: describeBuffered(video),
+          readyState: video.readyState,
+          networkState: video.networkState,
+        })
+      }
       s.seeking = false
       if (s.pendingFrame !== null) {
         const t = s.pendingFrame
@@ -138,7 +192,14 @@ export function useScrollVideo({ src, fps = 24, sectionId, range = [0, 1] }) {
       const wantT = Math.min(duration - frame, Math.round(local * duration / frame) * frame)
 
       if (!s.seeking) {
-        if (Math.abs(wantT - s.applied) >= frame * 0.5) seekTo(wantT)
+        if (Math.abs(wantT - s.applied) >= frame * 0.5) {
+          // Dev-only: surface whether the target is already locally buffered.
+          // If it is NOT, this seek will issue a fresh network Range request.
+          if (!isSeekInsideBuffer(video, wantT)) {
+            trace('seek-buffer-miss', { to: wantT, buffered: describeBuffered(video) })
+          }
+          seekTo(wantT)
+        }
       } else {
         // seek in flight — hold the newest target for when it resolves
         if (s.pendingFrame === null || Math.abs(wantT - s.pendingFrame) >= frame * 0.5) {
