@@ -1,5 +1,4 @@
-import { gsap } from '@/lib/gsap'
-import { qualityRef } from '@/hooks/useQuality'
+import { deviceTier } from '@/lib/deviceTier'
 
 /**
  * CANONICAL MASTER TIMELINE
@@ -147,7 +146,7 @@ export function computePriorities(activeId, activeLocal, velocity, predictedId) 
     } else {
       // Distant — unload past a hysteresis distance.
       const dist = Math.abs(j - idx)
-      const max = qualityRef.current === 'high' ? UNLOAD_DISTANCE : UNLOAD_DISTANCE_LOW
+      const max = deviceTier.current === 'high' ? UNLOAD_DISTANCE : UNLOAD_DISTANCE_LOW
       p = dist <= max ? 1 : 0
     }
     out.set(id, p)
