@@ -8,25 +8,13 @@ import { MarbleMaterial, BrassMaterial, GlassMaterial, BlueprintMaterial } from 
 /* Shared damping helper — everything moves late, never instantly. */
 const damp = (cur, target, lambda, dt) => THREE.MathUtils.damp(cur, target, lambda, dt)
 
-/* Reusable shared geometries — created once, never disposed (lives for app lifetime). */
-const _sphereGeo = new THREE.SphereGeometry(1, 48, 48)
-const _torusGeo = new THREE.TorusGeometry(1, 0.055, 12, 64)
-const _boxGeo = new THREE.BoxGeometry(1.35, 1.35, 1.35)
-const _boxEdges = new THREE.EdgesGeometry(_boxGeo)
-
-// WireframeVilla volumes — memoized once.
-const _villaGeos = [
-  new THREE.EdgesGeometry(new THREE.BoxGeometry(3.4, 0.95, 1.9)),
-  new THREE.EdgesGeometry(new THREE.BoxGeometry(1.3, 2.05, 1.5)),
-  new THREE.EdgesGeometry(new THREE.BoxGeometry(1.1, 0.7, 0.9)),
-  new THREE.EdgesGeometry(new THREE.BoxGeometry(3.8, 0.06, 2.3)),
-]
-const _columnGeo = new THREE.EdgesGeometry(new THREE.CylinderGeometry(0.045, 0.045, 0.92, 8))
-
 /* ================================================================== */
 export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
   const mesh = useRef()
   const mat = useMemo(() => new THREE.ShaderMaterial({ ...MarbleMaterial, uniforms: THREE.UniformsUtils.clone(MarbleMaterial.uniforms) }), [])
+  // 48×48 segments is visually indistinguishable from 96×96 on this smooth
+  // procedural sphere at these camera distances, but is ~4× fewer vertices.
+  const geo = useMemo(() => new THREE.SphereGeometry(1, 48, 48), [])
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
@@ -43,7 +31,7 @@ export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
   })
 
   return (
-    <mesh ref={mesh} position={position} scale={scale} material={mat} geometry={_sphereGeo} />
+    <mesh ref={mesh} position={position} scale={scale} material={mat} geometry={geo} />
   )
 }
 
@@ -51,6 +39,9 @@ export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
 export function BrassRing({ position = [0, 0, 0], scale = 1, phase = 1.2 }) {
   const mesh = useRef()
   const mat = useMemo(() => new THREE.ShaderMaterial({ ...BrassMaterial, uniforms: THREE.UniformsUtils.clone(BrassMaterial.uniforms) }), [])
+  // Toroidal: 12 radial × 64 tubular. The ring is thin and viewed from afar,
+  // so the dense 48×256 grid only burned fill rate with no visible gain.
+  const geo = useMemo(() => new THREE.TorusGeometry(1, 0.055, 12, 64), [])
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
@@ -66,7 +57,7 @@ export function BrassRing({ position = [0, 0, 0], scale = 1, phase = 1.2 }) {
   })
 
   return (
-    <mesh ref={mesh} position={position} scale={scale} material={mat} geometry={_torusGeo} />
+    <mesh ref={mesh} position={position} scale={scale} material={mat} geometry={geo} />
   )
 }
 
@@ -76,6 +67,8 @@ export function MaterialCube({ position = [0, 0, 0], scale = 1, colorRef }) {
   const group = useRef()
   const mat = useMemo(() => new THREE.ShaderMaterial({ ...MarbleMaterial, uniforms: THREE.UniformsUtils.clone(MarbleMaterial.uniforms) }), [])
   const target = useMemo(() => new THREE.Color('#EDEAE4'), [])
+  const geo = useMemo(() => new THREE.BoxGeometry(1.35, 1.35, 1.35), [])
+  const edges = useMemo(() => new THREE.EdgesGeometry(geo), [geo])
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
@@ -93,9 +86,9 @@ export function MaterialCube({ position = [0, 0, 0], scale = 1, colorRef }) {
 
   return (
     <group ref={group} position={position} scale={scale}>
-      <mesh material={mat} geometry={_boxGeo} />
-      {/* Brass edge outline — pre-computed EdgesGeometry, shared across all instances. */}
-      <lineSegments geometry={_boxEdges} scale={1.002}>
+      <mesh material={mat} geometry={geo} />
+      {/* Brass edge outline — computed once from the same box geometry. */}
+      <lineSegments geometry={edges} scale={1.002}>
         <lineBasicMaterial color="#A98D67" transparent opacity={0.5} />
       </lineSegments>
     </group>
@@ -134,18 +127,21 @@ export function WireframeVilla({ position = [0, 0, 0], scale = 1, buildRef }) {
     []
   )
 
-  // Massing volumes and columns are pre-computed shared geometries (module-level).
+  // Massing volumes and columns are memoized once; their edge geometries too.
   const volumes = useMemo(
     () => [
-      { p: [0, 0, 0], s: 0 },
-      { p: [1.2, 0.55, -0.35], s: 1 },
-      { p: [-1.5, -0.12, 0.85], s: 2 },
-      { p: [0, 1.02, 0], s: 3 },
+      { p: [0, 0, 0], g: new THREE.EdgesGeometry(new THREE.BoxGeometry(3.4, 0.95, 1.9)) },
+      { p: [1.2, 0.55, -0.35], g: new THREE.EdgesGeometry(new THREE.BoxGeometry(1.3, 2.05, 1.5)) },
+      { p: [-1.5, -0.12, 0.85], g: new THREE.EdgesGeometry(new THREE.BoxGeometry(1.1, 0.7, 0.9)) },
+      { p: [0, 1.02, 0], g: new THREE.EdgesGeometry(new THREE.BoxGeometry(3.8, 0.06, 2.3)) },
     ],
     []
   )
 
-  const columns = useMemo(() => Array.from({ length: 7 }, (_, i) => [-1.55 + i * 0.52, -0.06, 1.02]), [])
+  const columns = useMemo(() => {
+    const colGeo = new THREE.EdgesGeometry(new THREE.CylinderGeometry(0.045, 0.045, 0.92, 8))
+    return Array.from({ length: 7 }, (_, i) => ({ p: [-1.55 + i * 0.52, -0.06, 1.02], g: colGeo }))
+  }, [])
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
@@ -161,10 +157,10 @@ export function WireframeVilla({ position = [0, 0, 0], scale = 1, buildRef }) {
   return (
     <group ref={group} position={position} scale={scale}>
       {volumes.map((v, i) => (
-        <lineSegments key={i} position={v.p} material={mat} geometry={_villaGeos[i]} />
+        <lineSegments key={i} position={v.p} material={mat} geometry={v.g} />
       ))}
-      {columns.map((p, i) => (
-        <lineSegments key={`c${i}`} position={p} material={mat} geometry={_columnGeo} />
+      {columns.map((c, i) => (
+        <lineSegments key={`c${i}`} position={c.p} material={mat} geometry={c.g} />
       ))}
       {/* Site grid */}
       <gridHelper args={[9, 18, '#3E6B7A', '#22404A']} position={[0, -0.5, 0]} />
