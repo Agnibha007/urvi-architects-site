@@ -80,6 +80,7 @@ export function useScrollVideo({
 
     const onSeeked = () => {
       s.seeking = false
+      s.seekDeadline = 0
     }
     video.addEventListener('seeked', onSeeked)
 
@@ -87,11 +88,18 @@ export function useScrollVideo({
     // Writing currentTime every tick without a gate causes the browser to
     // cancel in-flight seeks, which can momentarily show no frame. We keep
     // a lightweight seek-state flag and allow a new seek only after the
-    // previous one resolves — or after a timeout safety valve so the
-    // video can never get permanently stuck.
+    // previous one resolves — or after a short safety valve so the video
+    // can never get permanently stuck (some decoders never fire 'seeked').
     let stRef = null
-    const commit = () => {
-      if (!s.ready || s.seeking) return
+    const commit = (tickTime) => {
+      if (!s.ready || s.seeking) {
+        // Safety valve: if a seek was requested but never resolved within
+        // 250ms, force it through so the frame is never stuck mid-decode.
+        if (s.seeking && tickTime > s.seekDeadline) {
+          s.seeking = false
+          s.seekDeadline = 0
+        } else return
+      }
       // Skip seeking when the video's ScrollTrigger is not active —
       // avoids wasting decoder cycles on off-screen videos.
       if (stRef && !stRef.isActive) return
@@ -105,10 +113,33 @@ export function useScrollVideo({
 
       s.applied = wanted
       s.seeking = true
+      s.seekDeadline = tickTime + 250
       video.currentTime = wanted
     }
 
     gsap.ticker.add(commit)
+
+    // requestVideoFrameCallback: where supported, fire a pending seek the
+    // moment the previous frame is presented to screen rather than waiting
+    // for the next rAF tick. Only re-arms while the clip is on screen, so an
+    // off-screen video isn't paying a per-frame callback for nothing.
+    let disposed = false
+    let rvfcArmed = false
+    const onVideoFrame = () => {
+      rvfcArmed = false
+      if (disposed) return
+      if (stRef?.isActive && s.ready) {
+        commit(performance.now())
+        if (!rvfcArmed && typeof video.requestVideoFrameCallback === 'function') {
+          rvfcArmed = true
+          video.requestVideoFrameCallback(onVideoFrame)
+        }
+      }
+    }
+    if (typeof video.requestVideoFrameCallback === 'function') {
+      rvfcArmed = true
+      video.requestVideoFrameCallback(onVideoFrame)
+    }
 
     /* ---- scroll binding --------------------------------------------- */
     const [rIn, rOut] = cfg.current.range
@@ -128,6 +159,7 @@ export function useScrollVideo({
     })
 
     return () => {
+      disposed = true
       gsap.ticker.remove(commit)
       stRef?.kill()
       io.disconnect()

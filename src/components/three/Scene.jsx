@@ -4,6 +4,7 @@ import { AdaptiveDpr, AdaptiveEvents, Preload } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollStore } from '@/hooks/useScrollStore'
 import { pointer } from '@/hooks/usePointer'
+import { useQuality } from '@/hooks/useQuality'
 import { MarbleSphere, BrassRing, MaterialCube, GlassPlane, WireframeVilla, LightParticles } from './Objects'
 
 /**
@@ -127,8 +128,10 @@ function useMediaFlags() {
 
 export default function Scene({ cubeColorRef, buildRef }) {
   const { reduced: reducedRef, mobile: mobileRef } = useMediaFlags()
+  const quality = useQuality()
+  const q = quality.current
 
-  const dprMax = mobileRef.current ? 1.5 : reducedRef.current ? 1.5 : 2
+  const dprMax = q === 'low' ? 1.5 : q === 'medium' ? 1.75 : 2
 
   return (
     <div
@@ -160,11 +163,11 @@ export default function Scene({ cubeColorRef, buildRef }) {
           {/* Chapter-anchored objects. They live at fixed world positions;
               the camera is what moves between them. */}
           <Gate chapters={['hero', 'living', 'kitchen', 'bedroom', 'finale', 'contact']}>
-            <MarbleSphere position={[3.1, 0.7, -1.4]} scale={0.62} phase={0} />
+            <MarbleSphere position={[3.1, 0.7, -1.4]} scale={0.62} phase={0} quality={q} />
           </Gate>
 
           <Gate chapters={['hero', 'kitchen', 'bedroom', 'materials', 'finale', 'contact']}>
-            <BrassRing position={[-3.3, -0.9, -0.6]} scale={0.78} phase={1.4} />
+            <BrassRing position={[-3.3, -0.9, -0.6]} scale={0.78} phase={1.4} quality={q} />
           </Gate>
 
           <Gate chapters={['living', 'kitchen', 'bedroom', 'finale']}>
@@ -180,7 +183,7 @@ export default function Scene({ cubeColorRef, buildRef }) {
             <WireframeVilla position={[0, -0.35, -1.2]} scale={0.72} buildRef={buildRef} />
           </Gate>
 
-          {!mobileRef.current && <LightParticles count={reducedRef.current ? 120 : 420} />}
+          {q !== 'low' && <LightParticles count={q === 'high' ? 420 : 260} />}
           <LightShafts />
 
           <Preload all />

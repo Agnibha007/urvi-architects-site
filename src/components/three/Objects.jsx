@@ -9,12 +9,13 @@ import { MarbleMaterial, BrassMaterial, GlassMaterial, BlueprintMaterial } from 
 const damp = (cur, target, lambda, dt) => THREE.MathUtils.damp(cur, target, lambda, dt)
 
 /* ================================================================== */
-export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
+export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0, quality = 'high' }) {
   const mesh = useRef()
   const mat = useMemo(() => new THREE.ShaderMaterial({ ...MarbleMaterial, uniforms: THREE.UniformsUtils.clone(MarbleMaterial.uniforms) }), [])
-  // 48×48 segments is visually indistinguishable from 96×96 on this smooth
-  // procedural sphere at these camera distances, but is ~4× fewer vertices.
-  const geo = useMemo(() => new THREE.SphereGeometry(1, 48, 48), [])
+  // Segments tiered by device. 48×48 is visually indistinguishable from 96×96
+  // on this smooth procedural sphere at these distances, but ~4× fewer verts.
+  const seg = quality === 'low' ? 32 : quality === 'medium' ? 40 : 48
+  const geo = useMemo(() => new THREE.SphereGeometry(1, seg, seg), [seg])
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
@@ -36,12 +37,13 @@ export function MarbleSphere({ position = [0, 0, 0], scale = 1, phase = 0 }) {
 }
 
 /* ================================================================== */
-export function BrassRing({ position = [0, 0, 0], scale = 1, phase = 1.2 }) {
+export function BrassRing({ position = [0, 0, 0], scale = 1, phase = 1.2, quality = 'high' }) {
   const mesh = useRef()
   const mat = useMemo(() => new THREE.ShaderMaterial({ ...BrassMaterial, uniforms: THREE.UniformsUtils.clone(BrassMaterial.uniforms) }), [])
-  // Toroidal: 12 radial × 64 tubular. The ring is thin and viewed from afar,
-  // so the dense 48×256 grid only burned fill rate with no visible gain.
-  const geo = useMemo(() => new THREE.TorusGeometry(1, 0.055, 12, 64), [])
+  // Toroidal: radial × tubular tiered by device. The ring is thin and viewed
+  // from afar, so the dense 48×256 grid only burned fill rate with no gain.
+  const tubular = quality === 'high' ? 64 : quality === 'medium' ? 48 : 32
+  const geo = useMemo(() => new THREE.TorusGeometry(1, 0.055, quality === 'low' ? 8 : 12, tubular), [tubular, quality])
 
   useFrame((_, dt) => {
     const t = performance.now() / 1000
@@ -67,6 +69,7 @@ export function MaterialCube({ position = [0, 0, 0], scale = 1, colorRef }) {
   const group = useRef()
   const mat = useMemo(() => new THREE.ShaderMaterial({ ...MarbleMaterial, uniforms: THREE.UniformsUtils.clone(MarbleMaterial.uniforms) }), [])
   const target = useMemo(() => new THREE.Color('#EDEAE4'), [])
+  // Flat-faced box — no need for any subdivision.
   const geo = useMemo(() => new THREE.BoxGeometry(1.35, 1.35, 1.35), [])
   const edges = useMemo(() => new THREE.EdgesGeometry(geo), [geo])
 
